@@ -14,7 +14,7 @@ const HomePage = () => {
   // console.log(session);
   const router = useRouter();
 
-  const { data: session, isPending, error, refetch } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   const signOut = async () => {
     await authClient.signOut({

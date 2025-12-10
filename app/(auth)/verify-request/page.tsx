@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,10 +18,9 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { Loader2Icon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-const VerifyRequestPage = () => {
+const VerifyRequestForm = () => {
   const router = useRouter();
   const [otp, setOtp] = useState("");
   const [emailPending, startEmailTransition] = useTransition();
@@ -96,6 +96,25 @@ const VerifyRequestPage = () => {
         </Button>
       </CardContent>
     </Card>
+  );
+};
+
+const VerifyRequestPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <Card className="w-full mx-auto">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">Loading verification...</CardTitle>
+            <CardDescription>
+              Preparing your verification form, please wait.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      }
+    >
+      <VerifyRequestForm />
+    </Suspense>
   );
 };
 
