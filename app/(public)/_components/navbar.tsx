@@ -56,7 +56,14 @@ export const Navbar = () => {
           <div className="flex items-center space-x-4">
             <AnimatedThemeToggler />
             {isPending ? null : session ? (
-              <UserDropdown name={session.user.name || ""} email={session.user.email || ""} image={session.user.image || ""} />
+              <UserDropdown
+                name={session.user.name || ""}
+                email={session.user.email || ""}
+                image={
+                  session.user.image ||
+                  `https://avatar.vercel.sh/${session?.user?.email}`
+                }
+              />
             ) : (
               <>
                 <Link
