@@ -1,3 +1,5 @@
+import "server-only";
+
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
