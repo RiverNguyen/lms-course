@@ -156,7 +156,50 @@ const Uploader = () => {
         ...prev,
         isDeleting: true,
       }));
-    } catch (error) {}
+
+      const res = await fetch("/api/s3/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ key: fileState.key }),
+      });
+
+      if (!res.ok) {
+        toast.error("Failed to delete file");
+        setFileState((prev) => ({
+          ...prev,
+          isDeleting: true,
+          error: true,
+        }));
+        return;
+      }
+
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+
+      setFileState(() => ({
+        file: null,
+        uploading: false,
+        progress: 0,
+        objectUrl: "",
+        error: false,
+        fileType: "image",
+        id: null,
+        isDeleting: false,
+      }));
+
+      toast.success("File deleted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete file");
+      setFileState((prev) => ({
+        ...prev,
+        isDeleting: false,
+        error: true,
+      }));
+    }
   };
 
   const rejectedFiles = (fileRejections: FileRejection[]) => {
@@ -203,7 +246,13 @@ const Uploader = () => {
     }
 
     if (fileState.objectUrl) {
-      return <RenderSuccessState previewUrl={fileState.objectUrl} />;
+      return (
+        <RenderSuccessState
+          previewUrl={fileState.objectUrl}
+          isDeleting={fileState.isDeleting}
+          handleRemoveFile={handleRemoveFile}
+        />
+      );
     }
 
     return <RenderEmptyState isDragActive={isDragActive} />;
@@ -224,6 +273,7 @@ const Uploader = () => {
     multiple: false,
     maxSize: 1024 * 1024 * 5, // 5MB
     onDropRejected: rejectedFiles,
+    disabled: fileState.uploading || !!fileState.objectUrl,
   });
 
   return (

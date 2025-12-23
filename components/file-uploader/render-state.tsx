@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CloudUploadIcon, ImageIcon, XIcon } from "lucide-react";
+import { CloudUploadIcon, ImageIcon, Loader2Icon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 
@@ -48,7 +48,15 @@ export const RenderErrorState = () => {
   );
 };
 
-export const RenderSuccessState = ({ previewUrl }: { previewUrl: string }) => {
+export const RenderSuccessState = ({
+  previewUrl,
+  isDeleting,
+  handleRemoveFile,
+}: {
+  previewUrl: string;
+  isDeleting: boolean;
+  handleRemoveFile: () => void;
+}) => {
   return (
     <div className="">
       <Image
@@ -62,8 +70,14 @@ export const RenderSuccessState = ({ previewUrl }: { previewUrl: string }) => {
         size="icon"
         type="button"
         className={cn("absolute top-4 right-4")}
+        onClick={handleRemoveFile}
+        disabled={isDeleting}
       >
-        <XIcon className="size-4" />
+        {isDeleting ? (
+          <Loader2Icon className="size-4 animate-spin" />
+        ) : (
+          <XIcon className="size-4" />
+        )}
       </Button>
     </div>
   );
