@@ -11,8 +11,10 @@ export const RichTextEditor = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
   field,
+  disabled,
 }: {
   field: ControllerRenderProps<TFieldValues, TName>;
+  disabled: boolean;
 }) => {
   const editor = useEditor({
     extensions: [
@@ -36,8 +38,8 @@ export const RichTextEditor = <
 
   return (
     <div className="w-full border border-input rounded-lg overflow-hidden dark:bg-input/30">
-      <Menubar editor={editor} />
-      <EditorContent editor={editor} />
+      <Menubar editor={editor} disabled={disabled} />
+      <EditorContent editor={editor} disabled={disabled} />
     </div>
   );
 };

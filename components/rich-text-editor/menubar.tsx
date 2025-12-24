@@ -27,9 +27,10 @@ import {
 
 interface MenubarProps {
   editor: Editor | null;
+  disabled: boolean;
 }
 
-export const Menubar = ({ editor }: MenubarProps) => {
+export const Menubar = ({ editor, disabled }: MenubarProps) => {
   if (!editor) return null;
 
   return (
@@ -39,6 +40,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Toggle
+                disabled={disabled}
                 size="sm"
                 pressed={editor.isActive("bold")}
                 onPressedChange={() =>
@@ -59,6 +61,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("italic")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleItalic().run()
@@ -78,6 +81,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("strike")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleStrike().run()
@@ -97,6 +101,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("underline")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleUnderline().run()
@@ -116,6 +121,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("heading")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run()
@@ -135,6 +141,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("heading", { level: 2 })}
                 onPressedChange={() =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run()
@@ -154,6 +161,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("heading", { level: 3 })}
                 onPressedChange={() =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run()
@@ -173,6 +181,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("bulletList")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleBulletList().run()
@@ -192,6 +201,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive("orderedList")}
                 onPressedChange={() =>
                   editor.chain().focus().toggleOrderedList().run()
@@ -215,6 +225,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive({ textAlign: "left" })}
                 onPressedChange={() =>
                   editor.chain().focus().setTextAlign("left").run()
@@ -234,6 +245,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive({ textAlign: "center" })}
                 onPressedChange={() =>
                   editor.chain().focus().setTextAlign("center").run()
@@ -253,6 +265,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
             <TooltipTrigger asChild>
               <Toggle
                 size="sm"
+                disabled={disabled}
                 pressed={editor.isActive({ textAlign: "right" })}
                 onPressedChange={() =>
                   editor.chain().focus().setTextAlign("right").run()
@@ -279,7 +292,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
                 variant="ghost"
                 type="button"
                 onClick={() => editor.chain().focus().undo().run()}
-                disabled={!editor.can().undo()}
+                disabled={!editor.can().undo() || disabled}
               >
                 <Undo2 />
               </Button>
@@ -294,7 +307,7 @@ export const Menubar = ({ editor }: MenubarProps) => {
                 variant="ghost"
                 type="button"
                 onClick={() => editor.chain().focus().redo().run()}
-                disabled={!editor.can().redo()}
+                disabled={!editor.can().redo() || disabled}
               >
                 <Redo2 />
               </Button>

@@ -1,5 +1,8 @@
 "use client";
 
+import { CreateCourse } from "@/app/admin/courses/create/action";
+import Uploader from "@/components/file-uploader/uploader";
+import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -9,17 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  CourseSchemaType,
-  courseCategories,
-  courseLevels,
-  courseSchema,
-  courseStatuses,
-} from "@/lib/zod-schemas";
-import { ArrowLeftIcon, PlusIcon, SparklesIcon } from "lucide-react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
   Form,
   FormControl,
   FormField,
@@ -28,8 +20,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import slugify from "slugify";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -37,10 +27,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RichTextEditor } from "@/components/rich-text-editor/editor";
-import Uploader from "@/components/file-uploader/uploader";
+import { Textarea } from "@/components/ui/textarea";
+import { tryCatch } from "@/hooks/try-catch";
+import {
+  CourseSchemaType,
+  courseCategories,
+  courseLevels,
+  courseSchema,
+  courseStatuses,
+} from "@/lib/zod-schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeftIcon, Loader2, PlusIcon, SparklesIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import slugify from "slugify";
+import { toast } from "sonner";
 
 const CourseCreatePage = () => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
   const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -64,7 +72,22 @@ const CourseCreatePage = () => {
   };
 
   const onSubmit = (data: CourseSchemaType) => {
-    console.log(data);
+    startTransition(async () => {
+      const { data: response, error } = await tryCatch(CreateCourse(data));
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (response.status === "success") {
+        toast.success(response.message);
+        form.reset();
+        router.push("/admin/courses");
+      } else if (response.status === "error") {
+        toast.error(response.message);
+      }
+    });
   };
 
   return (
@@ -92,33 +115,17 @@ const CourseCreatePage = () => {
         <CardContent>
           <Form {...form}>
             <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter the title of the course"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-4 items-end">
+              <div className="flex items-start gap-4">
                 <FormField
                   control={form.control}
-                  name="slug"
+                  name="title"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Slug</FormLabel>
+                      <FormLabel>Title</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter the slug of the course"
+                          disabled={isPending}
+                          placeholder="Enter the title of the course"
                           {...field}
                         />
                       </FormControl>
@@ -126,9 +133,33 @@ const CourseCreatePage = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="button" className="w-fit" onClick={generateSlug}>
-                  Generate Slug <SparklesIcon className="ml-1" size={16} />
-                </Button>
+
+                <div className="flex gap-4 w-full">
+                  <FormField
+                    control={form.control}
+                    name="slug"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Slug</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={isPending}
+                            placeholder="Enter the slug of the course"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    className="w-fit mt-5.5"
+                    onClick={generateSlug}
+                  >
+                    Generate Slug <SparklesIcon className="ml-1" size={16} />
+                  </Button>
+                </div>
               </div>
 
               <FormField
@@ -141,6 +172,7 @@ const CourseCreatePage = () => {
                       <Textarea
                         placeholder="Enter the small description of the course"
                         className="min-h-[120px]"
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -156,7 +188,7 @@ const CourseCreatePage = () => {
                   <FormItem className="w-full">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <RichTextEditor field={field} />
+                      <RichTextEditor field={field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,14 +202,18 @@ const CourseCreatePage = () => {
                   <FormItem className="w-full">
                     <FormLabel>Thumbnail Image</FormLabel>
                     <FormControl>
-                      <Uploader />
+                      <Uploader
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={isPending}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-4">
                 <FormField
                   control={form.control}
                   name="category"
@@ -189,7 +225,10 @@ const CourseCreatePage = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger
+                            className="w-full"
+                            disabled={isPending}
+                          >
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
@@ -217,7 +256,10 @@ const CourseCreatePage = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger
+                            className="w-full"
+                            disabled={isPending}
+                          >
                             <SelectValue placeholder="Select a level" />
                           </SelectTrigger>
                         </FormControl>
@@ -243,6 +285,8 @@ const CourseCreatePage = () => {
                       <FormControl>
                         <Input
                           placeholder="Enter the duration of the course"
+                          disabled={isPending}
+                          type="number"
                           {...field}
                         />
                       </FormControl>
@@ -260,6 +304,7 @@ const CourseCreatePage = () => {
                       <FormControl>
                         <Input
                           placeholder="Enter the price of the course"
+                          disabled={isPending}
                           {...field}
                         />
                       </FormControl>
@@ -280,7 +325,7 @@ const CourseCreatePage = () => {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full" disabled={isPending}>
                           <SelectValue placeholder="Select a status" />
                         </SelectTrigger>
                       </FormControl>
@@ -297,8 +342,17 @@ const CourseCreatePage = () => {
                 )}
               />
 
-              <Button>
-                Create Course <PlusIcon className="ml-1" size={16} />
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Creating course...
+                  </>
+                ) : (
+                  <>
+                    Create Course <PlusIcon className="ml-1" size={16} />
+                  </>
+                )}
               </Button>
             </form>
           </Form>
