@@ -33,9 +33,9 @@ export const courseSchema = z.object({
     .regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid decimal")
     .refine((val) => Number(val) > 0, "Price must be greater than 0"),
   duration: z
-    .number()
-    .min(1, { message: "Duration must be at least 1 hour" })
-    .max(500, { message: "Duration must be less than 500 hours" }),
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Duration must be a valid decimal")
+    .refine((val) => Number(val) > 0, "Duration must be greater than 0"),
   level: z.enum(courseLevels, { message: "Invalid course level" }),
   category: z.enum(courseCategories, { message: "Invalid course category" }),
   smallDescription: z
