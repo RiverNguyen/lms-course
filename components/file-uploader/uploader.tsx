@@ -5,13 +5,14 @@ import {
   RenderErrorState,
   RenderSuccessState,
 } from "@/components/file-uploader/render-state";
+import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
+import { useConstructUrl } from "@/hooks/use-construct-url";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 
 interface UploaderState {
   id: string | null;
@@ -32,6 +33,7 @@ interface UploaderProps {
 }
 
 const Uploader = ({ value, onChange, disabled }: UploaderProps) => {
+  const fileUrl = useConstructUrl(value || "");
   const [fileState, setFileState] = useState<UploaderState>({
     id: null,
     file: null,
@@ -40,8 +42,8 @@ const Uploader = ({ value, onChange, disabled }: UploaderProps) => {
     key: value || undefined,
     isDeleting: false,
     error: false,
-    objectUrl: "",
     fileType: "image",
+    objectUrl: fileUrl,
   });
 
   const uploadFile = useCallback(
