@@ -1,8 +1,10 @@
+import CourseStructure from "@/app/admin/courses/[courseId]/edit/_components/course-structure";
 import EditCourseForm from "@/app/admin/courses/[courseId]/edit/_components/edit-course-form";
 import { adminGetCourse } from "@/app/data/admin/admin-get-course";
 import {
   Tabs,
   TabsContent,
+  TabsContents,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/animate-tabs";
@@ -33,19 +35,35 @@ const EditCoursePage = async ({ params }: { params: Params }) => {
           <TabsTrigger value="course-structure">Course Structure</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="basic-info">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Info</CardTitle>
-              <CardDescription>
-                Provide basic information about the course
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <EditCourseForm data={data} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <TabsContents>
+          <TabsContent value="basic-info">
+            <Card>
+              <CardHeader>
+                <CardTitle>Basic Info</CardTitle>
+                <CardDescription>
+                  Provide basic information about the course
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EditCourseForm data={data} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="course-structure">
+            <Card>
+              <CardHeader>
+                <CardTitle>Course Structure</CardTitle>
+                <CardDescription>
+                  Provide course structure for the course
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CourseStructure data={data} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </TabsContents>
       </Tabs>
     </div>
   );

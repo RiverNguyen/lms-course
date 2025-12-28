@@ -4,7 +4,7 @@ import { SectionCards } from "@/components/sidebar/section-cards";
 
 import data from "./data.json";
 
-const AdminIndexPage = () => {
+const AdminIndexPage = async () => {
   return (
     <>
       <SectionCards />
