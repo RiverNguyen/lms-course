@@ -1,5 +1,11 @@
 "use client";
 
+import NewChapterModal from "@/app/admin/courses/[courseId]/edit/_components/new-chapter-modal";
+import NewLessonModal from "@/app/admin/courses/[courseId]/edit/_components/new-lesson-modal";
+import {
+  ReorderChapters,
+  ReorderLessons,
+} from "@/app/admin/courses/[courseId]/edit/action";
 import { AdminCourseSingleType } from "@/app/data/admin/admin-get-course";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,11 +42,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-  ReorderChapters,
-  ReorderLessons,
-} from "@/app/admin/courses/[courseId]/edit/action";
-import NewChapterModal from "@/app/admin/courses/[courseId]/edit/_components/new-chapter-modal";
+import DeleteLesson from "./delete-lesson";
 
 interface CourseStructureProps {
   data: AdminCourseSingleType;
@@ -373,18 +375,21 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
                                         {lesson.title}
                                       </Link>
                                     </div>
-                                    <Button variant="ghost" size="icon">
-                                      <Trash2Icon className="size-4 text-destructive" />
-                                    </Button>
+                                    <DeleteLesson
+                                      chapterId={item.id}
+                                      courseId={data.id}
+                                      lessonId={lesson.id}
+                                    />
                                   </div>
                                 )}
                               </SortableItem>
                             ))}
                           </SortableContext>
                           <div className="p-2">
-                            <Button variant={"outline"} className="w-full">
-                              Create New Lesson
-                            </Button>
+                            <NewLessonModal
+                              courseId={data.id}
+                              chapterId={item.id}
+                            />
                           </div>
                         </div>
                       </CollapsibleContent>
