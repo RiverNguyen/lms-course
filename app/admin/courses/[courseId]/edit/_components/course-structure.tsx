@@ -34,9 +34,12 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ReorderLessons } from "@/app/admin/courses/[courseId]/edit/action";
+import {
+  ReorderChapters,
+  ReorderLessons,
+} from "@/app/admin/courses/[courseId]/edit/action";
 
 interface CourseStructureProps {
   data: AdminCourseSingleType;
@@ -67,6 +70,26 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
   }));
 
   const [items, setItems] = useState<typeof initialItems>(initialItems);
+
+  useEffect(() => {
+    setItems((prevItems) => {
+      const updatedItems =
+        data.chapters.map((chapter) => ({
+          id: chapter.id,
+          title: chapter.title,
+          order: chapter.position,
+          isOpen:
+            prevItems.find((item) => item.id === chapter.id)?.isOpen ?? true,
+          lessons: chapter.lessons.map((lesson) => ({
+            id: lesson.id,
+            title: lesson.title,
+            order: lesson.position,
+          })),
+        })) || [];
+
+      return updatedItems;
+    });
+  }, [data]);
 
   function SortableItem({ children, id, className, data }: SortableItemProps) {
     const {
@@ -143,7 +166,32 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
         })
       );
 
+      const previousItems = [...items];
+
       setItems(updatedChapterForState);
+
+      if (courseId) {
+        const chaptersToUpdate = updatedChapterForState.map((chapter) => ({
+          id: chapter.id,
+          position: chapter.order,
+        }));
+
+        const reorderChaptersPromise = () =>
+          ReorderChapters(courseId, chaptersToUpdate);
+        toast.promise(reorderChaptersPromise, {
+          loading: "Reordering chapters...",
+          success: (result) => {
+            if (result.status === "success") {
+              return result.message;
+            }
+            throw new Error(result.message);
+          },
+          error: () => {
+            setItems(previousItems);
+            return "Failed to reorder chapters";
+          },
+        });
+      }
     }
 
     if (activeType === "lesson" && overType === "lesson") {
