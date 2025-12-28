@@ -40,6 +40,7 @@ import {
   ReorderChapters,
   ReorderLessons,
 } from "@/app/admin/courses/[courseId]/edit/action";
+import NewChapterModal from "@/app/admin/courses/[courseId]/edit/_components/new-chapter-modal";
 
 interface CourseStructureProps {
   data: AdminCourseSingleType;
@@ -294,6 +295,7 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between border-b border-border">
           <CardTitle>Chapters</CardTitle>
+          <NewChapterModal courseId={data.id} />
         </CardHeader>
         <CardContent className="space-y-8">
           <SortableContext items={items} strategy={verticalListSortingStrategy}>
