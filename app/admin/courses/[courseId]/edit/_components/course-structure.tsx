@@ -43,6 +43,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DeleteLesson from "./delete-lesson";
+import DeleteChapter from "./delete-chapter";
 
 interface CourseStructureProps {
   data: AdminCourseSingleType;
@@ -342,9 +343,7 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
                             {item.title}
                           </p>
                         </div>
-                        <Button size="icon" variant="ghost">
-                          <Trash2Icon className="size-4 text-destructive" />
-                        </Button>
+                        <DeleteChapter chapterId={item.id} courseId={data.id} />
                       </div>
                       <CollapsibleContent>
                         <div className="p-1">
