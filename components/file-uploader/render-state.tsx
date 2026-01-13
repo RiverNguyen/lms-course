@@ -52,19 +52,25 @@ export const RenderSuccessState = ({
   previewUrl,
   isDeleting,
   handleRemoveFile,
+  fileType,
 }: {
   previewUrl: string;
   isDeleting: boolean;
   handleRemoveFile: () => void;
+  fileType: "image" | "video";
 }) => {
   return (
-    <div className="">
-      <Image
-        src={previewUrl}
-        alt="Uploaded file"
-        fill
-        className="object-contain p-2"
-      />
+    <div className="relative group w-full h-full flex items-center justify-center">
+      {fileType === "video" ? (
+        <video src={previewUrl} controls className="rounded-md w-full h-full" />
+      ) : (
+        <Image
+          src={previewUrl}
+          alt="Uploaded file"
+          fill
+          className="object-contain p-2"
+        />
+      )}
       <Button
         variant="destructive"
         size="icon"
