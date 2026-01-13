@@ -33,17 +33,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  ChevronDown,
-  FileTextIcon,
-  GripVerticalIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { ChevronDown, FileTextIcon, GripVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import DeleteLesson from "./delete-lesson";
 import DeleteChapter from "./delete-chapter";
+import DeleteLesson from "./delete-lesson";
 
 interface CourseStructureProps {
   data: AdminCourseSingleType;
