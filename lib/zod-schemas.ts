@@ -28,6 +28,7 @@ export const courseSchema = z.object({
     .min(3, { message: "Description must be at least 3 characters" })
     .max(1000, { message: "Description must be less than 1000 characters" }),
   fileKey: z.string().min(1),
+  galleryKeys: z.array(z.string()).optional(),
   price: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid decimal")
@@ -37,7 +38,11 @@ export const courseSchema = z.object({
     .regex(/^\d+(\.\d{1,2})?$/, "Duration must be a valid decimal")
     .refine((val) => Number(val) > 0, "Duration must be greater than 0"),
   level: z.enum(courseLevels, { message: "Invalid course level" }),
-  category: z.enum(courseCategories, { message: "Invalid course category" }),
+  categoryId: z
+    .string()
+    .uuid({ message: "Invalid category ID" })
+    .optional()
+    .nullable(),
   smallDescription: z
     .string()
     .min(3, { message: "Small description must be at least 3 characters" })
@@ -65,8 +70,25 @@ export const lessonSchema = z.object({
   videoKey: z.string().optional(),
 });
 
+export const categorySchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "Name must be at least 3 characters" })
+    .max(100, { message: "Name must be less than 100 characters" }),
+  slug: z
+    .string()
+    .min(3, { message: "Slug must be at least 3 characters" })
+    .max(100, { message: "Slug must be less than 100 characters" }),
+  description: z
+    .string()
+    .max(500, { message: "Description must be less than 500 characters" })
+    .optional(),
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 
 export type LessonSchemaType = z.infer<typeof lessonSchema>;
+
+export type CategorySchemaType = z.infer<typeof categorySchema>;

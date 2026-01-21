@@ -2,10 +2,9 @@
 
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import arcjet, { fixedWindow } from "@/lib/arcjet";
-import { CourseLevel, CourseStatus } from "@/lib/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
-import { CourseSchemaType, courseSchema } from "@/lib/zod-schemas";
+import { CategorySchemaType, categorySchema } from "@/lib/zod-schemas";
 import { request } from "@arcjet/next";
 
 const aj = arcjet.withRule(
@@ -16,8 +15,8 @@ const aj = arcjet.withRule(
   })
 );
 
-export const CreateCourse = async (
-  values: CourseSchemaType
+export const CreateCategory = async (
+  values: CategorySchemaType
 ): Promise<ApiResponse> => {
   const session = await requireAdmin();
   try {
@@ -39,7 +38,7 @@ export const CreateCourse = async (
         };
       }
     }
-    const validation = courseSchema.safeParse(values);
+    const validation = categorySchema.safeParse(values);
 
     if (!validation.success) {
       return {
@@ -48,26 +47,29 @@ export const CreateCourse = async (
       };
     }
 
-    await prisma.course.create({
-      data: {
-        title: validation.data.title,
-        description: validation.data.description,
-        fileKey: validation.data.fileKey,
-        galleryKeys: validation.data.galleryKeys ?? [],
-        price: validation.data.price,
-        duration: validation.data.duration,
-        level: validation.data.level as CourseLevel,
-        status: validation.data.status as CourseStatus,
-        categoryId: validation.data.categoryId || null,
-        smallDescription: validation.data.smallDescription,
+    // Check if slug already exists
+    const existingCategory = await prisma.category.findUnique({
+      where: {
         slug: validation.data.slug,
-        userId: session?.user.id,
+      },
+    });
+
+    if (existingCategory) {
+      return {
+        status: "error",
+        message: "A category with this slug already exists",
+      };
+    }
+
+    await prisma.category.create({
+      data: {
+        ...validation.data,
       },
     });
 
     return {
       status: "success",
-      message: "Course created successfully",
+      message: "Category created successfully",
     };
   } catch (error) {
     return {

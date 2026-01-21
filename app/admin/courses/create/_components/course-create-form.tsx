@@ -1,5 +1,8 @@
 "use client";
 
+import { CreateCourse } from "@/app/admin/courses/create/action";
+import { AllCategoriesType } from "@/app/data/category/get-all-categories";
+import GalleryUploader from "@/components/file-uploader/gallery-uploader";
 import Uploader from "@/components/file-uploader/uploader";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { tryCatch } from "@/hooks/try-catch";
+import { useConfetti } from "@/hooks/use-confetti";
 import {
   CourseSchemaType,
   courseLevels,
@@ -34,32 +38,30 @@ import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 import { toast } from "sonner";
-import { EditCourse } from "@/app/admin/courses/[courseId]/edit/action";
-import { AdminCourseSingleType } from "@/app/data/admin/admin-get-course";
-import { AllCategoriesType } from "@/app/data/category/get-all-categories";
 
-interface EditCourseFormProps {
-  data: AdminCourseSingleType;
+interface CourseCreateFormProps {
   categories: AllCategoriesType[];
 }
 
-const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
+const CourseCreateForm = ({ categories }: CourseCreateFormProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { triggerConfetti } = useConfetti();
 
   const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
-      title: data.title,
-      description: data.description,
-      smallDescription: data.smallDescription,
-      slug: data.slug,
-      status: data.status,
-      level: data.level,
-      categoryId: data.categoryId || null,
-      duration: data.duration,
-      price: data.price,
-      fileKey: data.fileKey,
+      title: "",
+      description: "",
+      fileKey: "",
+      galleryKeys: [],
+      price: "",
+      duration: "",
+      level: "Beginner",
+      categoryId: null,
+      smallDescription: "",
+      slug: "",
+      status: "Draft",
     },
   });
 
@@ -69,11 +71,9 @@ const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
     form.setValue("slug", slug, { shouldValidate: true });
   };
 
-  const onSubmit = (formData: CourseSchemaType) => {
+  const onSubmit = (data: CourseSchemaType) => {
     startTransition(async () => {
-      const { data: response, error } = await tryCatch(
-        EditCourse(formData, data.id)
-      );
+      const { data: response, error } = await tryCatch(CreateCourse(data));
 
       if (error) {
         toast.error(error.message);
@@ -82,6 +82,7 @@ const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
 
       if (response.status === "success") {
         toast.success(response.message);
+        triggerConfetti();
         form.reset();
         router.push("/admin/courses");
       } else if (response.status === "error") {
@@ -184,6 +185,25 @@ const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
                   value={field.value}
                   onChange={field.onChange}
                   disabled={isPending}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="galleryKeys"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Gallery Images</FormLabel>
+              <FormControl>
+                <GalleryUploader
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  disabled={isPending}
+                  maxFiles={10}
                 />
               </FormControl>
               <FormMessage />
@@ -318,11 +338,11 @@ const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
           {isPending ? (
             <>
               <Loader2 className="size-4 animate-spin" />
-              Updating course...
+              Creating course...
             </>
           ) : (
             <>
-              Update Course <PlusIcon className="ml-1" size={16} />
+              Create Course <PlusIcon className="ml-1" size={16} />
             </>
           )}
         </Button>
@@ -331,4 +351,4 @@ const EditCourseForm = ({ data, categories }: EditCourseFormProps) => {
   );
 };
 
-export default EditCourseForm;
+export default CourseCreateForm;

@@ -2,11 +2,10 @@
 
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import arcjet, { fixedWindow } from "@/lib/arcjet";
-import { CourseLevel, CourseStatus } from "@/lib/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
-import { CourseSchemaType, courseSchema } from "@/lib/zod-schemas";
 import { request } from "@arcjet/next";
+import { revalidatePath } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -16,8 +15,8 @@ const aj = arcjet.withRule(
   })
 );
 
-export const CreateCourse = async (
-  values: CourseSchemaType
+export const DeleteCategory = async (
+  categoryId: string
 ): Promise<ApiResponse> => {
   const session = await requireAdmin();
   try {
@@ -25,7 +24,6 @@ export const CreateCourse = async (
     const decision = await aj.protect(req, {
       fingerprint: session?.user.id as string,
     });
-
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         return {
@@ -35,39 +33,44 @@ export const CreateCourse = async (
       } else {
         return {
           status: "error",
-          message: "You are a bot!",
+          message: "Unauthorized",
         };
       }
     }
-    const validation = courseSchema.safeParse(values);
 
-    if (!validation.success) {
-      return {
-        status: "error",
-        message: "Invalid data",
-      };
-    }
-
-    await prisma.course.create({
-      data: {
-        title: validation.data.title,
-        description: validation.data.description,
-        fileKey: validation.data.fileKey,
-        galleryKeys: validation.data.galleryKeys ?? [],
-        price: validation.data.price,
-        duration: validation.data.duration,
-        level: validation.data.level as CourseLevel,
-        status: validation.data.status as CourseStatus,
-        categoryId: validation.data.categoryId || null,
-        smallDescription: validation.data.smallDescription,
-        slug: validation.data.slug,
-        userId: session?.user.id,
+    // Check if category exists
+    const category = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+      include: {
+        _count: {
+          select: {
+            courses: true,
+          },
+        },
       },
     });
 
+    if (!category) {
+      return {
+        status: "error",
+        message: "Category not found",
+      };
+    }
+
+    // Delete the category (courses will have categoryId set to null due to onDelete: SetNull)
+    await prisma.category.delete({
+      where: {
+        id: categoryId,
+      },
+    });
+
+    revalidatePath(`/admin/categories`);
+
     return {
       status: "success",
-      message: "Course created successfully",
+      message: "Category deleted successfully",
     };
   } catch (error) {
     return {

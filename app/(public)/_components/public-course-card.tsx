@@ -44,7 +44,9 @@ const PublicCourseCard = ({ data }: PublicCourseCardProps) => {
           </div>
           <div className="flex items-ceter gap-x-2">
             <SchoolIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{data?.category}</p>
+            <p className="text-sm text-muted-foreground">
+              {data?.category?.name || "Uncategorized"}
+            </p>
           </div>
         </div>
 

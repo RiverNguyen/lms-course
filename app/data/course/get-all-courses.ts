@@ -17,7 +17,13 @@ export const getAllCourses = async () => {
       id: true,
       level: true,
       duration: true,
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 

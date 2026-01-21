@@ -1,6 +1,7 @@
 import CourseStructure from "@/app/admin/courses/[courseId]/edit/_components/course-structure";
 import EditCourseForm from "@/app/admin/courses/[courseId]/edit/_components/edit-course-form";
 import { adminGetCourse } from "@/app/data/admin/admin-get-course";
+import { getAllCategories } from "@/app/data/category/get-all-categories";
 import {
   Tabs,
   TabsContent,
@@ -20,7 +21,10 @@ type Params = Promise<{ courseId: string }>;
 
 const EditCoursePage = async ({ params }: { params: Params }) => {
   const { courseId } = await params;
-  const data = await adminGetCourse(courseId);
+  const [data, categories] = await Promise.all([
+    adminGetCourse(courseId),
+    getAllCategories(),
+  ]);
 
   return (
     <div>
@@ -45,7 +49,7 @@ const EditCoursePage = async ({ params }: { params: Params }) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <EditCourseForm data={data} />
+                <EditCourseForm data={data} categories={categories} />
               </CardContent>
             </Card>
           </TabsContent>

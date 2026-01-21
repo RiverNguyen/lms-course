@@ -45,6 +45,11 @@ const data = {
       icon: IconListDetails,
     },
     {
+      title: "Categories",
+      url: "/admin/categories",
+      icon: IconFolder,
+    },
+    {
       title: "Analytics",
       url: "#",
       icon: IconChartBar,

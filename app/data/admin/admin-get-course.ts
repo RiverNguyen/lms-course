@@ -19,7 +19,14 @@ export const adminGetCourse = async (courseId: string) => {
       price: true,
       duration: true,
       level: true,
-      category: true,
+      categoryId: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
       smallDescription: true,
       slug: true,
       status: true,

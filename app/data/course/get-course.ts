@@ -14,7 +14,13 @@ export const getIndividualCourse = async (slug: string) => {
       price: true,
       duration: true,
       level: true,
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
       smallDescription: true,
       chapters: {
         select: {

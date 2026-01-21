@@ -1,7 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/app/data/admin/require-admin";
-import arcjet, { detectBot, fixedWindow } from "@/lib/arcjet";
+import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { CourseLevel, CourseStatus } from "@/lib/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
@@ -16,20 +16,13 @@ import {
 import { request } from "@arcjet/next";
 import { revalidatePath } from "next/cache";
 
-const aj = arcjet
-  .withRule(
-    detectBot({
-      mode: "LIVE",
-      allow: [],
-    })
-  )
-  .withRule(
-    fixedWindow({
-      mode: "LIVE",
-      window: "1m",
-      max: 5,
-    })
-  );
+const aj = arcjet.withRule(
+  fixedWindow({
+    mode: "LIVE",
+    window: "1m",
+    max: 5,
+  })
+);
 
 export const EditCourse = async (
   data: CourseSchemaType,
@@ -71,9 +64,16 @@ export const EditCourse = async (
         userId: session?.user?.id as string,
       },
       data: {
-        ...result.data,
+        title: result.data.title,
+        description: result.data.description,
+        fileKey: result.data.fileKey,
+        price: result.data.price,
+        duration: result.data.duration,
         level: result.data.level as CourseLevel,
         status: result.data.status as CourseStatus,
+        categoryId: result.data.categoryId || null,
+        smallDescription: result.data.smallDescription,
+        slug: result.data.slug,
       },
     });
 
