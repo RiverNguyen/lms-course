@@ -23,6 +23,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { EnrollmentButton } from "./_components/enrollment-button";
+import { buttonVariants } from "@/components/ui/button";
 
 type Params = Promise<{ slug: string }>;
 
@@ -268,7 +269,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
 
 
               {isEnrolled ? (
-                <Link href={'course'}>Watch Course</Link>
+                <Link href={'course'} className={buttonVariants({ className: 'w-full' })}>Watch Course</Link>
               ) : (
                 <EnrollmentButton courseId={course?.id} />
               )}

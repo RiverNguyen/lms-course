@@ -145,11 +145,12 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
           }
         ],
         mode: 'payment',
-        success_url: `${env.BETTER_AUTH_URL}/payment/success`,
+        success_url: `${env.BETTER_AUTH_URL}/payment/success?course=${course.slug}`,
         cancel_url: `${env.BETTER_AUTH_URL}/payment/cancel`,
         metadata: {
           userId: user.id,
           courseId: course.id,
+          courseSlug: course.slug,
           enrollmentId: enrollment.id
         }
       })

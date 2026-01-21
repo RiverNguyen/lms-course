@@ -9,7 +9,7 @@ const aj = arcjet({
     detectBot({
       mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
       // Block all bots except the following
-      allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:MONITOR", "CATEGORY:PREVIEW"],
+      allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:MONITOR", "CATEGORY:PREVIEW", "STRIPE_WEBHOOK"],
     }),
   ],
 });
