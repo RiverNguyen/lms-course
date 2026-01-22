@@ -4,6 +4,7 @@ import { resend } from "@/lib/resend";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
+import { admin } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -53,6 +54,12 @@ export const auth = betterAuth({
           `,
         });
       },
+    }),
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+      bannedUserMessage:
+        "You have been banned from this application. Please contact support if you believe this is an error.",
     }),
   ],
 });

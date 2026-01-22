@@ -30,7 +30,10 @@ export const LoginForm = () => {
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Logged in successfully");
+            toast.success(
+              "Login with Github successfully, redirecting to homepage..."
+            );
+            router.push("/");
           },
           onError: (error) => {
             toast.error(error.error.message);
