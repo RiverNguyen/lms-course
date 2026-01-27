@@ -5,6 +5,7 @@ import { CourseSidebarData } from "@/app/data/course/get-course-sidebar-data";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useCourseProgress } from "@/hooks/use-course-progress";
 import { ChevronDown, Play } from "lucide-react";
 import { usePathname } from "next/navigation";
 interface CourseSidebarProps {
@@ -14,6 +15,8 @@ interface CourseSidebarProps {
 export default function CourseSidebar({ course }: CourseSidebarProps) {
   const pathname = usePathname();
   const currentLessonId = pathname.split("/").pop();
+
+  const { totalLessons, completedLessons, progressPercentage } = useCourseProgress({ course });
 
   return (
     <div className="flex flex-col h-full">
@@ -32,10 +35,10 @@ export default function CourseSidebar({ course }: CourseSidebarProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Progress</span>
-            <span className="font-medium">4/10 lessons</span>
+            <span className="font-medium">{completedLessons}/{totalLessons} lessons</span>
           </div>
-          <AnimatedCircularProgressBar max={10} min={0} value={5} gaugePrimaryColor="var(--primary)" gaugeSecondaryColor="color-mix(in oklch, var(--primary) 20%, transparent)" className="mx-auto" />
-          <p className="text-sm font-medium mt-2 text-center">55% complete</p>
+          <AnimatedCircularProgressBar max={totalLessons} min={0} value={completedLessons} gaugePrimaryColor="var(--primary)" gaugeSecondaryColor="color-mix(in oklch, var(--primary) 20%, transparent)" className="mx-auto" />
+          <p className="text-sm font-medium mt-2 text-center">{progressPercentage}% complete</p>
         </div>
       </div>
 
@@ -57,7 +60,7 @@ export default function CourseSidebar({ course }: CourseSidebarProps) {
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-3 pl-6 border-l-2 space-y-3">
               {chapter.lessons.map((lesson) => (
-                <LessonItem key={lesson.id} lesson={lesson} slug={course.slug} isActive={currentLessonId === lesson.id} />
+                <LessonItem key={lesson.id} lesson={lesson} slug={course.slug} isActive={currentLessonId === lesson.id} completed={lesson.lessonProgresses.find((progress) => progress.lessonId === lesson.id)?.completed || false} />
               ))}
             </CollapsibleContent>
           </Collapsible>

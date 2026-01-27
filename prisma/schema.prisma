@@ -22,6 +22,7 @@ model User {
   accounts      Account[]
   courses       Course[]
   enrollments   Enrollment[]
+  lessonProgresses LessonProgress[]
 
   stripeCustomerId String? @unique
 
@@ -149,6 +150,8 @@ model Lesson {
 
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  lessonProgresses LessonProgress[]
 }
 
 model Enrollment {
@@ -189,5 +192,22 @@ model Category {
 
   @@index([slug])
   @@map("category")
+}
+
+model LessonProgress {
+  id String @id @default(uuid())
+
+  completed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lessonId String
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
 }
 

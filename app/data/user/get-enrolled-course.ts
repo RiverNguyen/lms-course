@@ -23,6 +23,21 @@ export const getEnrolledCourse = async () => {
           chapters: {
             select: {
               id: true,
+              lessons: {
+                select: {
+                  id: true,
+                  lessonProgresses: {
+                    where: {
+                      userId: user.id,
+                    },
+                    select: {
+                      completed: true,
+                      lessonId: true,
+                      id: true,
+                    },
+                  }
+                }
+              }
             }
           }
         }
@@ -32,3 +47,5 @@ export const getEnrolledCourse = async () => {
 
   return data;
 }
+
+export type EnrolledCourseType = Awaited<ReturnType<typeof getEnrolledCourse>>[number];

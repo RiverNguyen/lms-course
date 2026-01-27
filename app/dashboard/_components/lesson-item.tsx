@@ -1,6 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckCircle, Play } from "lucide-react";
+import { Check, Play } from "lucide-react";
 import Link from "next/link";
 
 interface LessonItemProps {
@@ -12,11 +12,10 @@ interface LessonItemProps {
   }
   slug: string
   isActive?: boolean
+  completed?: boolean
 }
 
-export default function LessonItem({ lesson, slug, isActive }: LessonItemProps) {
-  const completed = false;
-
+export default function LessonItem({ lesson, slug, isActive, completed }: LessonItemProps) {
   return (
     <Link href={`/dashboard/${slug}/${lesson.id}`} className={buttonVariants({
       variant: completed ? "secondary" : "outline",
@@ -26,7 +25,7 @@ export default function LessonItem({ lesson, slug, isActive }: LessonItemProps) 
         <div className="shrink-0">
           {completed ? (
             <div className="size-5 rounded-full bg-green-600 dark:bg-green-500 flex items-center justify-center">
-              <CheckCircle className="size-3 text-white" />
+              <Check className="size-3 text-white" />
             </div>
           ) : (
             <div className={cn("size-5 rounded-full border-2 bg-background flex justify-center items-center", isActive ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-muted-foreground/20 bg-muted-foreground/10 dark:bg-muted-foreground/20')}>
