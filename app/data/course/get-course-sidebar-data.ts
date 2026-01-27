@@ -70,7 +70,7 @@ export const getCourseSidebarData = async (slug: string) => {
     }
   })
 
-  if (!enrollment || enrollment.status !== 'Active') {
+  if (!enrollment || (enrollment.status !== 'Active' && enrollment.status !== 'Completed')) {
     return notFound();
   }
 

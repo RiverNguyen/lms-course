@@ -45,7 +45,8 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
         id: true,
         title: true,
         price: true,
-        slug: true
+        slug: true,
+        stripePriceId: true
       }
     })
 
@@ -56,6 +57,14 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
       }
     }
 
+    if (!course.stripePriceId) {
+      return {
+        status: 'error',
+        message: 'Course price is not configured. Please contact support.'
+      }
+    }
+
+    const stripePriceId: string = course.stripePriceId;
     let stripeCustomerId: string;
 
     const userWithStripeCustomerId = await prisma.user.findUnique({
@@ -104,7 +113,7 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
         }
       })
 
-      if (existingEnrollment?.status === 'Active') {
+      if (existingEnrollment?.status === 'Active' || existingEnrollment?.status === 'Completed') {
         return {
           status: 'success',
           message: 'You are already enrolled in this course'
@@ -139,9 +148,8 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
         customer: stripeCustomerId,
         line_items: [
           {
-            price: 'price_1SryYf8NjBnIMixP8J4WY6mK',
+            price: stripePriceId,
             quantity: 1,
-
           }
         ],
         mode: 'payment',
@@ -178,3 +186,213 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
 
   redirect(checkoutUrl);
 }
+
+export const createReviewAction = async (
+  courseId: string,
+  rating: number,
+  comment?: string
+): Promise<ApiResponse> => {
+  try {
+    const user = await requireUser();
+
+    // Check if user has enrolled in the course
+    const enrollment = await prisma.enrollment.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: courseId,
+        },
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    if (!enrollment || (enrollment.status !== 'Active' && enrollment.status !== 'Completed')) {
+      return {
+        status: 'error',
+        message: 'You must enroll in this course before leaving a review'
+      };
+    }
+
+    // Validate rating
+    if (rating < 1 || rating > 5) {
+      return {
+        status: 'error',
+        message: 'Rating must be between 1 and 5'
+      };
+    }
+
+    // Check if user already has a review for this course
+    const existingReview = await prisma.review.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: courseId,
+        },
+      },
+    });
+
+    if (existingReview) {
+      return {
+        status: 'error',
+        message: 'You have already reviewed this course. You can update your existing review instead.'
+      };
+    }
+
+    // Create review
+    await prisma.review.create({
+      data: {
+        rating,
+        comment: comment || null,
+        courseId,
+        userId: user.id,
+      },
+    });
+
+    return {
+      status: 'success',
+      message: 'Review submitted successfully'
+    };
+  } catch (error) {
+    console.error('Error creating review:', error);
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Failed to create review'
+    };
+  }
+};
+
+export const updateReviewAction = async (
+  reviewId: string,
+  rating: number,
+  comment?: string
+): Promise<ApiResponse> => {
+  try {
+    const user = await requireUser();
+
+    // Validate rating
+    if (rating < 1 || rating > 5) {
+      return {
+        status: 'error',
+        message: 'Rating must be between 1 and 5'
+      };
+    }
+
+    // Check if review exists and belongs to user
+    const review = await prisma.review.findUnique({
+      where: {
+        id: reviewId,
+      },
+    });
+
+    if (!review) {
+      return {
+        status: 'error',
+        message: 'Review not found'
+      };
+    }
+
+    if (review.userId !== user.id) {
+      return {
+        status: 'error',
+        message: 'You can only update your own reviews'
+      };
+    }
+
+    // Update review
+    await prisma.review.update({
+      where: {
+        id: reviewId,
+      },
+      data: {
+        rating,
+        comment: comment || null,
+      },
+    });
+
+    return {
+      status: 'success',
+      message: 'Review updated successfully'
+    };
+  } catch (error) {
+    console.error('Error updating review:', error);
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Failed to update review'
+    };
+  }
+};
+
+export const deleteReviewAction = async (
+  reviewId: string
+): Promise<ApiResponse> => {
+  try {
+    const user = await requireUser();
+
+    // Check if review exists and belongs to user
+    const review = await prisma.review.findUnique({
+      where: {
+        id: reviewId,
+      },
+    });
+
+    if (!review) {
+      return {
+        status: 'error',
+        message: 'Review not found'
+      };
+    }
+
+    if (review.userId !== user.id) {
+      return {
+        status: 'error',
+        message: 'You can only delete your own reviews'
+      };
+    }
+
+    // Delete review
+    await prisma.review.delete({
+      where: {
+        id: reviewId,
+      },
+    });
+
+    return {
+      status: 'success',
+      message: 'Review deleted successfully'
+    };
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Failed to delete review'
+    };
+  }
+};
+
+export const getUserReviewForCourse = async (courseId: string) => {
+  try {
+    const user = await requireUser();
+
+    const review = await prisma.review.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: courseId,
+        },
+      },
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return review;
+  } catch (error) {
+    return null;
+  }
+};

@@ -1,8 +1,11 @@
 import { getIndividualCourse } from "@/app/data/course/get-course";
 import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
+import { getCourseReviews } from "@/app/data/course/get-course-reviews";
+import { getUserReviewForCourse } from "./actions";
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ReviewsSection } from "./_components/reviews-section";
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,9 +26,64 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { EnrollmentButton } from "./_components/enrollment-button";
+import { AddToCartButton } from "./_components/add-to-cart-button";
 import { buttonVariants } from "@/components/ui/button";
+import type { Metadata } from "next";
 
 type Params = Promise<{ slug: string }>;
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { slug } = await params;
+  const course = await getIndividualCourse(slug);
+
+  if (!course) {
+    return {
+      title: "Course Not Found",
+      description: "The course you are looking for does not exist.",
+    };
+  }
+
+  const courseImage = `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${course.fileKey}`;
+  const courseUrl = `/courses/${slug}`;
+  const description = course.smallDescription || `Learn ${course.title} with our comprehensive course. ${course.duration} hours of content, ${course.level} level.`;
+
+  return {
+    title: course.title,
+    description,
+    keywords: [
+      course.title,
+      course.category?.name || "course",
+      course.level,
+      "online course",
+      "e-learning",
+      "education",
+    ],
+    openGraph: {
+      title: course.title,
+      description,
+      url: courseUrl,
+      siteName: "TunaLMS",
+      images: [
+        {
+          url: courseImage,
+          width: 1200,
+          height: 630,
+          alt: course.title,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: course.title,
+      description,
+      images: [courseImage],
+    },
+    alternates: {
+      canonical: courseUrl,
+    },
+  };
+}
 
 export default async function CourseDetailPage({ params }: { params: Params }) {
   const { slug } = await params;
@@ -33,251 +91,279 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
   const course = await getIndividualCourse(slug);
 
   const isEnrolled = await checkIfCourseBought(course?.id);
+  
+  // Get reviews data
+  const reviewsData = await getCourseReviews(course?.id);
+  let userReview = null;
+  try {
+    userReview = await getUserReviewForCourse(course?.id);
+  } catch (error) {
+    // User not logged in, that's okay
+  }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
-      <div className="order-1 lg:col-span-2">
-        <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
-          <Image
-            src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${course?.fileKey}`}
-            alt={course?.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        </div>
-        <div className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">
-              {course?.title}
-            </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed line-clamp-2">
-              {course?.smallDescription}
-            </p>
+    <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
+        <div className="order-1 lg:col-span-2">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
+            <Image
+              src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${course?.fileKey}`}
+              alt={course?.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           </div>
+          <div className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tight">
+                {course?.title}
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed line-clamp-2">
+                {course?.smallDescription}
+              </p>
+            </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Badge className="flex items-center gap-1 px-3 py-1">
-              <IconChartBar className="size-4" />
-              <span>{course?.level}</span>
-            </Badge>
-            <Badge className="flex items-center gap-1 px-3 py-1">
-              <IconCategory2 className="size-4" />
-              <span>{course?.category?.name || "Uncategorized"}</span>
-            </Badge>
-            <Badge className="flex items-center gap-1 px-3 py-1">
-              <IconClock24 className="size-4" />
-              <span>{course?.duration} hours</span>
-            </Badge>
-          </div>
+            <div className="flex flex-wrap gap-3">
+              <Badge className="flex items-center gap-1 px-3 py-1">
+                <IconChartBar className="size-4" />
+                <span>{course?.level}</span>
+              </Badge>
+              <Badge className="flex items-center gap-1 px-3 py-1">
+                <IconCategory2 className="size-4" />
+                <span>{course?.category?.name || "Uncategorized"}</span>
+              </Badge>
+              <Badge className="flex items-center gap-1 px-3 py-1">
+                <IconClock24 className="size-4" />
+                <span>{course?.duration} hours</span>
+              </Badge>
+            </div>
 
-          <Separator className="my-8" />
+            <Separator className="my-8" />
 
-          <div className="space-y-6">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Course Description
-            </h2>
-            <RenderDescription description={JSON.parse(course?.description)} />
-          </div>
-        </div>
-
-        <div className="mt-12 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Course Content
-            </h2>
-            <div className="">
-              {course?.chapters.length} Chapter
-              {course?.chapters.length > 1 ? "s" : ""} |{" "}
-              {course?.chapters.reduce(
-                (acc, chapter) => acc + chapter.lessons.length,
-                0
-              ) || 0}{" "}
-              Lesson
-              {course?.chapters.reduce(
-                (acc, chapter) => acc + chapter.lessons.length,
-                0
-              ) > 1
-                ? "s"
-                : ""}
+            <div className="space-y-6">
+              <h2 className="text-3xl font-semibold tracking-tight">
+                Course Description
+              </h2>
+              <RenderDescription description={JSON.parse(course?.description)} />
             </div>
           </div>
 
-          <div className="space-y-4">
-            {course?.chapters.map((chapter, index) => (
-              <Collapsible key={chapter.id} defaultOpen={index === 0}>
-                <Card className="p-0 overflow-hidden border-2 transition-all duration-200 hover:shadow-md gap-0">
-                  <CollapsibleTrigger>
-                    <div className="">
-                      <CardContent className="p-6 hover:bg-muted/50 transition-all duration-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <p className="flex items-center size-10 justify-center font-semibold bg-primary/10 text-primary rounded-full">
-                              {index + 1}
-                            </p>
-                            <div className="">
-                              <h3 className="text-xl font-semibold text-left">
-                                {chapter.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground mt-1 text-left">
+          <div className="mt-12 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-semibold tracking-tight">
+                Course Content
+              </h2>
+              <div className="">
+                {course?.chapters.length} Chapter
+                {course?.chapters.length > 1 ? "s" : ""} |{" "}
+                {course?.chapters.reduce(
+                  (acc, chapter) => acc + chapter.lessons.length,
+                  0
+                ) || 0}{" "}
+                Lesson
+                {course?.chapters.reduce(
+                  (acc, chapter) => acc + chapter.lessons.length,
+                  0
+                ) > 1
+                  ? "s"
+                  : ""}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {course?.chapters.map((chapter, index) => (
+                <Collapsible key={chapter.id} defaultOpen={index === 0}>
+                  <Card className="p-0 overflow-hidden border-2 transition-all duration-200 hover:shadow-md gap-0">
+                    <CollapsibleTrigger>
+                      <div className="">
+                        <CardContent className="p-6 hover:bg-muted/50 transition-all duration-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <p className="flex items-center size-10 justify-center font-semibold bg-primary/10 text-primary rounded-full">
+                                {index + 1}
+                              </p>
+                              <div className="">
+                                <h3 className="text-xl font-semibold text-left">
+                                  {chapter.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1 text-left">
+                                  {chapter.lessons.length} Lesson
+                                  {chapter.lessons.length > 1 ? "s" : ""}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="text-xs">
                                 {chapter.lessons.length} Lesson
                                 {chapter.lessons.length > 1 ? "s" : ""}
-                              </p>
+                              </Badge>
+
+                              <IconChevronDown className="size-5 text-muted-foreground" />
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="text-xs">
-                              {chapter.lessons.length} Lesson
-                              {chapter.lessons.length > 1 ? "s" : ""}
-                            </Badge>
-
-                            <IconChevronDown className="size-5 text-muted-foreground" />
-                          </div>
+                        </CardContent>
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="border-t bg-muted/20">
+                        <div className="p-6 pt-4 space-y-3">
+                          {chapter.lessons.map((lesson, index) => (
+                            <div
+                              className="flex items-center gap-4 rounded-lg p-3 hover:bg-accent transition-all duration-200 group"
+                              key={lesson.id}
+                            >
+                              <div className="flex size-8 items-center justify-center rounded-full bg-background border-2 border-primary/20">
+                                <IconPlayerPlay className="size-4 text-muted-foreground group-hover:text-primary transition-all duration-200" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">
+                                  {lesson.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Lesson {index + 1}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </CardContent>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="border-t bg-muted/20">
-                      <div className="p-6 pt-4 space-y-3">
-                        {chapter.lessons.map((lesson, index) => (
-                          <div
-                            className="flex items-center gap-4 rounded-lg p-3 hover:bg-accent transition-all duration-200 group"
-                            key={lesson.id}
-                          >
-                            <div className="flex size-8 items-center justify-center rounded-full bg-background border-2 border-primary/20">
-                              <IconPlayerPlay className="size-4 text-muted-foreground group-hover:text-primary transition-all duration-200" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">
-                                {lesson.title}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Lesson {index + 1}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              ))}
+            </div>
+          </div>
+
+          {/* Reviews Section */}
+          <ReviewsSection
+            courseId={course?.id}
+            reviewsData={reviewsData}
+            userReview={userReview}
+            isEnrolled={isEnrolled}
+          />
+        </div>
+
+        <div className="order-2 lg:col-span-1">
+          <div className="sticky top-20">
+            <Card className="py-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-lg font-medium">Price:</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(Number(course?.price))}
+                  </span>
+                </div>
+
+                <div className="mb-6 space-y-3 rounded-lg bg-muted p-4">
+                  <h4 className="font-medium">What you will get:</h4>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <IconClock className="size-4" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Course Duration:</p>
+                        <p className="text-sm text-muted-foreground">
+                          {course?.duration} hours
+                        </p>
                       </div>
                     </div>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            ))}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <IconChartBar className="size-4" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Course Level:</p>
+                        <p className="text-sm text-muted-foreground">
+                          {course?.level}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <IconCategory2 className="size-4" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Course Category:</p>
+                        <p className="text-sm text-muted-foreground">
+                          {course?.category?.name}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <IconBook2 className="size-4" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Total Lessons:</p>
+                        <p className="text-sm text-muted-foreground">
+                          {course?.chapters.reduce(
+                            (acc, chapter) => acc + chapter.lessons.length,
+                            0
+                          ) || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6 space-y-3">
+                  <h4>This course includes:</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="rounded-full bg-green-500/10 text-green-500">
+                        <IconCheck className="size-3" />
+                      </div>
+                      <span>Full lifetime access</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="rounded-full bg-green-500/10 text-green-500">
+                        <IconCheck className="size-3" />
+                      </div>
+                      <span>Access on mobile and desktop</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-sm">
+                      <div className="rounded-full bg-green-500/10 text-green-500">
+                        <IconCheck className="size-3" />
+                      </div>
+                      <span>Certificate of completion</span>
+                    </li>
+                  </ul>
+                </div>
+
+
+                {isEnrolled ? (
+                  <Link href={`/dashboard/${slug}`} className={buttonVariants({ className: 'w-full' })}>Watch Course</Link>
+                ) : (
+                  <div className="space-y-2">
+                    <EnrollmentButton courseId={course?.id} />
+                    <AddToCartButton
+                      courseId={course?.id}
+                      courseTitle={course?.title}
+                      courseSlug={course?.slug}
+                      coursePrice={course?.price}
+                      courseFileKey={course?.fileKey}
+                    />
+                  </div>
+                )}
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  30-day money-back guarantee
+                </p>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
-
-      <div className="order-2 lg:col-span-1">
-        <div className="sticky top-20">
-          <Card className="py-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-lg font-medium">Price:</span>
-                <span className="text-2xl font-bold text-primary">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(Number(course?.price))}
-                </span>
-              </div>
-
-              <div className="mb-6 space-y-3 rounded-lg bg-muted p-4">
-                <h4 className="font-medium">What you will get:</h4>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <IconClock className="size-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Course Duration:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {course?.duration} hours
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <IconChartBar className="size-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Course Level:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {course?.level}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <IconCategory2 className="size-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Course Category:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {course?.category?.name}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <IconBook2 className="size-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Total Lessons:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {course?.chapters.reduce(
-                          (acc, chapter) => acc + chapter.lessons.length,
-                          0
-                        ) || 0}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6 space-y-3">
-                <h4>This course includes:</h4>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500">
-                      <IconCheck className="size-3" />
-                    </div>
-                    <span>Full lifetime access</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500">
-                      <IconCheck className="size-3" />
-                    </div>
-                    <span>Access on mobile and desktop</span>
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500">
-                      <IconCheck className="size-3" />
-                    </div>
-                    <span>Certificate of completion</span>
-                  </li>
-                </ul>
-              </div>
-
-
-              {isEnrolled ? (
-                <Link href={'course'} className={buttonVariants({ className: 'w-full' })}>Watch Course</Link>
-              ) : (
-                <EnrollmentButton courseId={course?.id} />
-              )}
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                30-day money-back guarantee
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

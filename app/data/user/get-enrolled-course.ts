@@ -8,7 +8,9 @@ export const getEnrolledCourse = async () => {
   const data = await prisma.enrollment.findMany({
     where: {
       userId: user.id,
-      status: 'Active',
+      status: {
+        in: ['Active', 'Completed'],
+      },
     },
     select: {
       course: {

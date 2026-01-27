@@ -1,12 +1,18 @@
+"use client";
+
 import { AllCoursesType } from "@/app/data/course/get-all-courses";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { ArrowRightIcon, SchoolIcon, TimerIcon } from "lucide-react";
+import { ArrowRightIcon, SchoolIcon, TimerIcon, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useCartStore } from "@/store/cart-store";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useCheckEnrollment } from "@/hooks/use-check-enrollment";
 
 interface PublicCourseCardProps {
   data: AllCoursesType;
@@ -14,6 +20,34 @@ interface PublicCourseCardProps {
 
 const PublicCourseCard = ({ data }: PublicCourseCardProps) => {
   const thumbnailUrl = useConstructUrl(data?.fileKey);
+  const addItem = useCartStore((state) => state.addItem);
+  const { isEnrolled } = useCheckEnrollment(data.id);
+  const isFree = data.price === "0" || parseFloat(data.price) === 0;
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isFree) {
+      toast.info("Free courses don't need to be added to cart");
+      return;
+    }
+
+    if (isEnrolled) {
+      toast.info("You already own this course");
+      return;
+    }
+
+    addItem({
+      id: data.id,
+      title: data.title,
+      slug: data.slug,
+      price: data.price,
+      fileKey: data.fileKey,
+    });
+    toast.success("Course added to cart!");
+  };
+
   return (
     <Card className="group relative py-0 gap-0">
       <Badge className="absolute top-2 right-2 z-[10]">{data?.level}</Badge>
@@ -22,7 +56,7 @@ const PublicCourseCard = ({ data }: PublicCourseCardProps) => {
         alt={data?.title}
         width={600}
         height={400}
-        className="w-full rounded-t-xl aspect-video h-full object-cover"
+        className="w-full rounded-t-xl aspect-video h-[250px] object-cover"
       />
 
       <CardContent className="p-4">
@@ -50,12 +84,24 @@ const PublicCourseCard = ({ data }: PublicCourseCardProps) => {
           </div>
         </div>
 
-        <Link
-          href={`/courses/${data?.slug}`}
-          className={buttonVariants({ className: "w-full mt-4" })}
-        >
-          Learn More <ArrowRightIcon className="size-4" />
-        </Link>
+        <div className="flex gap-2 mt-4">
+          <Link
+            href={`/courses/${data?.slug}`}
+            className={buttonVariants({ variant: "outline", className: "flex-1" })}
+          >
+            Learn More <ArrowRightIcon className="size-4" />
+          </Link>
+          {!isFree && !isEnrolled && (
+            <Button
+              variant="default"
+              className="flex-1"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="size-4 mr-2" />
+              Add to Cart
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

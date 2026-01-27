@@ -23,6 +23,9 @@ model User {
   courses       Course[]
   enrollments   Enrollment[]
   lessonProgresses LessonProgress[]
+  orders        Order[]
+  reviews        Review[]
+  certificates  Certificate[]
 
   stripeCustomerId String? @unique
 
@@ -90,7 +93,6 @@ model Course {
   title       String
   description String
   fileKey     String
-  galleryKeys String[]
   price       String
   duration    String
   level       CourseLevel
@@ -110,6 +112,8 @@ model Course {
   userId    String?
   chapters Chapter[]
   enrollments Enrollment[]
+  reviews Review[]
+  certificates Certificate[]
 
 }
 
@@ -209,5 +213,94 @@ model LessonProgress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  orderNumber String @unique
+  subtotal String
+  total String
+
+  status OrderStatus @default(Pending)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  orderItems OrderItem[]
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@map("order")
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  courseId String
+  courseTitle String
+  courseSlug String
+  coursePrice String
+  quantity Int
+
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([courseId])
+  @@map("order_item")
+}
+
+enum OrderStatus {
+  Pending
+  Processing
+  Completed
+  Cancelled
+  Refunded
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  rating Int // 1-5 stars
+  comment String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // One review per user per course
+  @@index([courseId])
+  @@index([userId])
+  @@map("review")
+}
+
+model Certificate {
+  id String @id @default(uuid())
+  
+  certificateNumber String @unique
+  issuedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // One certificate per user per course
+  @@index([courseId])
+  @@index([userId])
+  @@index([certificateNumber])
+  @@map("certificate")
 }
 

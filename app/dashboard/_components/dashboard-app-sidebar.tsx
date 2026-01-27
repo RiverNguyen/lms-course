@@ -7,7 +7,8 @@ import {
   IconFileDescription,
   IconHelp,
   IconSearch,
-  IconSettings
+  IconSettings,
+  IconCertificate
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -34,6 +35,11 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: IconDashboard,
+    },
+    {
+      title: "Certificates",
+      url: "/dashboard/certificates",
+      icon: IconCertificate,
     },
   ],
   navClouds: [

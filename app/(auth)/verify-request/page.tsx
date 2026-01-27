@@ -31,15 +31,35 @@ const VerifyRequestForm = () => {
 
   const verifyOtp = () => {
     startEmailTransition(async () => {
+      // signIn.emailOtp works for both sign-in and sign-up
+      // The OTP type is determined when sending the verification code
       await authClient.signIn.emailOtp({
         email,
         otp,
         fetchOptions: {
-          onSuccess: () => {
+          onSuccess: async () => {
+            // Check if user is banned after successful login
+            try {
+              const response = await fetch("/api/check-banned", {
+                method: "GET",
+                credentials: "include",
+              });
+              if (response.ok) {
+                const data = await response.json();
+                if (data.banned) {
+                  router.push("/banned");
+                  return;
+                }
+              }
+            } catch (error) {
+              console.error("Error checking banned status:", error);
+            }
             toast.success("Email verified successfully");
             router.push("/");
           },
           onError: (error) => {
+            // If better-auth blocks banned user, show error but allow retry
+            // The banned check will happen after successful login
             toast.error(error.error.message);
           },
         },

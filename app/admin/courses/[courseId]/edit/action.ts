@@ -2,8 +2,10 @@
 
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import arcjet, { fixedWindow } from "@/lib/arcjet";
+import { env } from "@/lib/env";
 import { CourseLevel, CourseStatus } from "@/lib/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 import { ApiResponse } from "@/lib/types";
 import {
   ChapterSchemaType,
@@ -58,6 +60,65 @@ export const EditCourse = async (
       };
     }
 
+    // Get current course to check for Stripe product
+    const currentCourse = await prisma.course.findUnique({
+      where: {
+        id: courseId,
+        userId: session?.user?.id as string,
+      },
+      select: {
+        stripePriceId: true,
+      },
+    });
+
+    if (!currentCourse) {
+      return {
+        status: "error",
+        message: "Course not found",
+      };
+    }
+
+    let updatedStripePriceId = currentCourse.stripePriceId;
+
+    // Update Stripe product if it exists
+    if (currentCourse.stripePriceId) {
+      try {
+        // Get the price to find the product ID
+        const price = await stripe.prices.retrieve(currentCourse.stripePriceId);
+        const productId = typeof price.product === 'string' ? price.product : price.product.id;
+
+        // Check if price has changed
+        const newPriceAmount = Number(result.data.price) * 100;
+        const priceChanged = price.unit_amount !== newPriceAmount;
+
+        // Update the product
+        await stripe.products.update(productId, {
+          name: result.data.title,
+          description: result.data.smallDescription,
+          images: [`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${result.data.fileKey}`],
+        });
+
+        // If price changed, create a new price and set it as default
+        if (priceChanged) {
+          const newPrice = await stripe.prices.create({
+            product: productId,
+            currency: 'usd',
+            unit_amount: newPriceAmount,
+          });
+
+          // Set the new price as default for the product
+          await stripe.products.update(productId, {
+            default_price: newPrice.id,
+          });
+
+          updatedStripePriceId = newPrice.id;
+        }
+      } catch (error) {
+        // If Stripe update fails, log but continue with database update
+        console.error("Failed to update Stripe product:", error);
+      }
+    }
+
     await prisma.course.update({
       where: {
         id: courseId,
@@ -74,6 +135,7 @@ export const EditCourse = async (
         categoryId: result.data.categoryId || null,
         smallDescription: result.data.smallDescription,
         slug: result.data.slug,
+        stripePriceId: updatedStripePriceId,
       },
     });
 
@@ -202,7 +264,7 @@ export const CreateChapter = async (
         data: {
           title: result.data.name,
           courseId: result.data.courseId,
-          position: (maxPos?.position ?? 1) + 1,
+          position: (maxPos?.position ?? 0) + 1,
         },
       });
     });
@@ -250,7 +312,7 @@ export const CreateLesson = async (
       await tx.lesson.create({
         data: {
           title: result.data.name,
-          position: (maxPos?.position ?? 1) + 1,
+          position: (maxPos?.position ?? 0) + 1,
           description: result.data.description,
           thumbnailKey: result.data.thumbnailKey,
           videoKey: result.data.videoKey,

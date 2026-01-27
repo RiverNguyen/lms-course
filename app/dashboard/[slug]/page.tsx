@@ -1,9 +1,35 @@
 import { getCourseSidebarData } from "@/app/data/course/get-course-sidebar-data";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 
 interface CourseSlugRouteProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: CourseSlugRouteProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const { course } = await getCourseSidebarData(slug);
+
+    return {
+      title: course.title,
+      description: `Access your enrolled course: ${course.title}. Continue your learning journey.`,
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  } catch {
+    return {
+      title: "Course",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 }
 
 export default async function CourseSlugRoute({ params }: CourseSlugRouteProps) {

@@ -29,7 +29,7 @@ const CourseProgressCard = ({ data }: CourseProgressCardProps) => {
         alt={data?.course?.title}
         width={600}
         height={400}
-        className="w-full rounded-t-xl aspect-video h-full object-cover"
+        className="w-full rounded-t-xl aspect-video h-[250px] object-cover"
       />
 
       <CardContent className="p-4">

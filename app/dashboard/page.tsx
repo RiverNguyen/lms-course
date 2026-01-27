@@ -3,6 +3,21 @@ import { getEnrolledCourse } from '@/app/data/user/get-enrolled-course'
 import EmptyState from "@/components/general/empty-state"
 import PublicCourseCard from "@/app/(public)/_components/public-course-card"
 import CourseProgressCard from "./_components/course-progress-card"
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Manage your enrolled courses and discover new learning opportunities. Track your progress and continue your learning journey.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: "Dashboard - TunaLMS",
+    description: "Manage your enrolled courses and discover new learning opportunities.",
+    url: "/dashboard",
+  },
+};
 
 export default async function DashboardPage() {
   const [allCourses, enrolledCourses] = await Promise.all([getAllCourses(), getEnrolledCourse()])

@@ -21,5 +21,5 @@ export const checkIfCourseBought = async (courseId: string): Promise<boolean> =>
     }
   })
 
-  return enrollment?.status === 'Active' ? true : false;
+  return enrollment?.status === 'Active' || enrollment?.status === 'Completed' ? true : false;
 }

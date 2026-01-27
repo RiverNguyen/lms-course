@@ -65,7 +65,6 @@ export const CreateCourse = async (
         title: validation.data.title,
         description: validation.data.description,
         fileKey: validation.data.fileKey,
-        galleryKeys: validation.data.galleryKeys ?? [],
         price: validation.data.price,
         duration: validation.data.duration,
         level: validation.data.level as CourseLevel,

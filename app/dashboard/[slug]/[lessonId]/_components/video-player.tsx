@@ -8,9 +8,10 @@ import { useEffect, useRef, useState } from "react";
 interface VideoPlayerProps {
   thumbnailKey: string;
   videoKey: string;
+  onVideoEnd?: () => void;
 }
 
-export const VideoPlayer = ({ thumbnailKey, videoKey }: VideoPlayerProps) => {
+export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerProps) => {
   const originalVideoUrl = useConstructUrl(videoKey);
   const thumbnailUrl = useConstructUrl(thumbnailKey);
   const { videoUrl, isLoading: isCacheLoading, isCached } = useVideoCache(videoKey, originalVideoUrl);
@@ -177,6 +178,11 @@ export const VideoPlayer = ({ thumbnailKey, videoKey }: VideoPlayerProps) => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
+    const handleEnded = () => {
+      if (onVideoEnd) {
+        onVideoEnd();
+      }
+    };
 
     video.addEventListener("timeupdate", updateTime);
     video.addEventListener("loadedmetadata", updateDuration);
@@ -184,6 +190,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey }: VideoPlayerProps) => {
     video.addEventListener("pause", handlePause);
     video.addEventListener("loadstart", handleLoadStart);
     video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("ended", handleEnded);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
@@ -193,9 +200,10 @@ export const VideoPlayer = ({ thumbnailKey, videoKey }: VideoPlayerProps) => {
       video.removeEventListener("pause", handlePause);
       video.removeEventListener("loadstart", handleLoadStart);
       video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("ended", handleEnded);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
-  }, [shouldLoad, hasPlayedOnce]);
+  }, [shouldLoad, hasPlayedOnce, onVideoEnd]);
 
   useEffect(() => {
     return () => {

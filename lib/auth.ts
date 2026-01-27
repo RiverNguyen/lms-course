@@ -1,6 +1,6 @@
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
-import { resend } from "@/lib/resend";
+import { sendEmailViaGmail } from "@/lib/gmail";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
@@ -15,13 +15,17 @@ export const auth = betterAuth({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
     },
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
   },
   plugins: [
     emailOTP({
       async sendVerificationOTP({ email, otp }) {
-        await resend.emails.send({
-          from: "TunaLMS <onboarding@resend.dev>",
-          to: [email],
+        await sendEmailViaGmail({
+          from: "TunaLMS",
+          to: email,
           subject: "TunaLMS - Verify your email",
           html: `
             <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f6f9fc;padding:24px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#0f172a;">
@@ -58,6 +62,8 @@ export const auth = betterAuth({
     admin({
       defaultRole: "user",
       adminRoles: ["admin"],
+      // Note: We handle banned users manually via BannedCheck component
+      // This message is shown if better-auth blocks login, but we prefer to allow login and redirect
       bannedUserMessage:
         "You have been banned from this application. Please contact support if you believe this is an error.",
     }),
