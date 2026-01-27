@@ -1,4 +1,4 @@
-import { BookOpen, HomeIcon, LayoutDashboard, LogOutIcon } from "lucide-react";
+import { BookOpen, HomeIcon, LayoutDashboard, LogOutIcon, ShieldUser } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useSignOut } from "@/hooks/use-sign-out";
+import Link from "next/link";
 
 const listItems = [
   {
@@ -39,9 +36,10 @@ interface IAppProps {
   name: string;
   email: string;
   image: string;
+  role: string;
 }
 
-const UserDropdown = ({ name, email, image }: IAppProps) => {
+const UserDropdown = ({ name, email, image, role }: IAppProps) => {
   const handleSignOut = useSignOut();
 
   return (
@@ -73,6 +71,14 @@ const UserDropdown = ({ name, email, image }: IAppProps) => {
               </Link>
             </DropdownMenuItem>
           ))}
+          {role === "admin" && (
+            <DropdownMenuItem asChild>
+              <Link href="/admin">
+                <ShieldUser className="size-4" />
+                <span className="text-popover-foreground">Admin</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleSignOut}>

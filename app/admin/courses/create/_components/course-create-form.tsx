@@ -2,7 +2,6 @@
 
 import { CreateCourse } from "@/app/admin/courses/create/action";
 import { AllCategoriesType } from "@/app/data/category/get-all-categories";
-import GalleryUploader from "@/components/file-uploader/gallery-uploader";
 import Uploader from "@/components/file-uploader/uploader";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,6 @@ const CourseCreateForm = ({ categories }: CourseCreateFormProps) => {
       title: "",
       description: "",
       fileKey: "",
-      galleryKeys: [],
       price: "",
       duration: "",
       level: "Beginner",
@@ -185,25 +183,6 @@ const CourseCreateForm = ({ categories }: CourseCreateFormProps) => {
                   value={field.value}
                   onChange={field.onChange}
                   disabled={isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="galleryKeys"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel>Gallery Images</FormLabel>
-              <FormControl>
-                <GalleryUploader
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  disabled={isPending}
-                  maxFiles={10}
                 />
               </FormControl>
               <FormMessage />

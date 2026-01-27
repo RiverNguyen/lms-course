@@ -20,6 +20,8 @@ export async function authMiddleware(request: NextRequest) {
   // THIS IS NOT SECURE!
   // This is the recommended approach to optimistically redirect users
   // We recommend handling auth checks in each page/route
+  // Note: Banned user check is handled in requireUser/requireAdmin (server-side)
+  // because Prisma cannot run in Edge Runtime
   if (!sessionCookie) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

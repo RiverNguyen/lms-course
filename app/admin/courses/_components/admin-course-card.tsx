@@ -65,7 +65,7 @@ const AdminCourseCard = ({ course }: AdminCourseCardProps) => {
         alt={course.title}
         width={600}
         height={600}
-        className="w-full rounded-t-lg aspect-video h-full object-cover"
+        className="w-full rounded-t-lg aspect-video h-[250px] object-cover"
       />
 
       <CardContent className="p-4">

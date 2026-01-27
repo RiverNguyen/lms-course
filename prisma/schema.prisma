@@ -22,14 +22,9 @@ model User {
   accounts      Account[]
   courses       Course[]
   enrollments   Enrollment[]
-  courseRatings CourseRating[]
-  courseComments CourseComment[]
-  couponUsages  CouponUsage[]
-  wishlistItems Wishlist[]
-  cart          Cart?
-  orders        Order[]
-  payments      Payment[]
   lessonProgresses LessonProgress[]
+  orders        Order[]
+  reviews        Review[]
   certificates  Certificate[]
 
   stripeCustomerId String? @unique
@@ -98,10 +93,11 @@ model Course {
   title       String
   description String
   fileKey     String
-  galleryKeys String[]
   price       String
   duration    String
   level       CourseLevel
+
+  stripePriceId String?  
 
   categoryId        String?
   category         Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -116,13 +112,9 @@ model Course {
   userId    String?
   chapters Chapter[]
   enrollments Enrollment[]
-  ratings   CourseRating[]
-  comments  CourseComment[]
-  wishlistItems Wishlist[]
-  cartItems CartItem[]
-  orderItems OrderItem[]
-  lessonProgresses LessonProgress[]
+  reviews Review[]
   certificates Certificate[]
+
 }
 
 enum CourseLevel {
@@ -162,7 +154,8 @@ model Lesson {
 
   chapterId String
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  progresses LessonProgress[]
+
+  lessonProgresses LessonProgress[]
 }
 
 model Enrollment {
@@ -192,86 +185,6 @@ enum EnrollmentStatus {
   Cancelled
 }
 
-model Coupon {
-  id           String        @id @default(uuid())
-  code         String        @unique
-  discountType DiscountType
-  discountValue Int
-  maxUses      Int?
-  usedCount    Int           @default(0)
-  validFrom    DateTime
-  validUntil   DateTime
-  isActive     Boolean       @default(true)
-  description  String?
-  minPurchaseAmount String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  usages       CouponUsage[]
-  carts        Cart[]
-  orders       Order[]
-
-  @@index([code])
-  @@index([isActive])
-  @@map("coupon")
-}
-
-enum DiscountType {
-  Percentage
-  Fixed
-}
-
-model CouponUsage {
-  id        String   @id @default(uuid())
-  couponId String
-  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  usedAt    DateTime @default(now())
-  orderId   String?
-  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
-
-  @@index([couponId])
-  @@index([userId])
-  @@index([orderId])
-  @@map("coupon_usage")
-}
-
-model CourseRating {
-  id        String   @id @default(uuid())
-  rating    Int      // 1-5 stars
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, courseId]) // Mỗi user chỉ có thể rating một course một lần
-  @@index([courseId])
-  @@index([userId])
-  @@index([rating])
-  @@map("course_rating")
-}
-
-model CourseComment {
-  id        String   @id @default(uuid())
-  comment   String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  parentId  String?  // Để hỗ trợ reply comment (optional)
-  parent    CourseComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies   CourseComment[] @relation("CommentReplies")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([courseId])
-  @@index([userId])
-  @@index([parentId])
-  @@map("course_comment")
-}
-
 model Category {
   id          String   @id @default(uuid())
   name        String
@@ -285,74 +198,62 @@ model Category {
   @@map("category")
 }
 
-model Wishlist {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+model LessonProgress {
+  id String @id @default(uuid())
+
+  completed Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, courseId]) // Mỗi user chỉ có thể thêm một course vào wishlist một lần
-  @@index([userId])
-  @@index([courseId])
-  @@map("wishlist")
-}
+  lessonId String
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
-model Cart {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  couponId String?
-  coupon    Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  items     CartItem[]
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@map("cart")
-}
-
-model CartItem {
-  id        String   @id @default(uuid())
-  cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([cartId, courseId]) // Mỗi course chỉ có thể có một lần trong một cart
-  @@index([cartId])
-  @@index([courseId])
-  @@map("cart_item")
+  @@unique([userId, lessonId])
 }
 
 model Order {
-  id              String      @id @default(uuid())
-  orderNumber     String      @unique
-  userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subtotal        Int         // Tổng tiền trước discount
-  discount        Int         @default(0) // Số tiền được giảm
-  total           Int         // Tổng tiền sau discount
-  couponId        String?
-  coupon          Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
-  status          OrderStatus @default(Pending)
-  shippingAddress String?
-  notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  items           OrderItem[]
-  payments        Payment[]
-  couponUsages    CouponUsage[]
+  id String @id @default(uuid())
+
+  orderNumber String @unique
+  subtotal String
+  total String
+
+  status OrderStatus @default(Pending)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  orderItems OrderItem[]
 
   @@index([userId])
   @@index([orderNumber])
-  @@index([status])
-  @@index([createdAt])
   @@map("order")
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  courseId String
+  courseTitle String
+  courseSlug String
+  coursePrice String
+  quantity Int
+
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([courseId])
+  @@map("order_item")
 }
 
 enum OrderStatus {
@@ -363,101 +264,43 @@ enum OrderStatus {
   Refunded
 }
 
-model OrderItem {
-  id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  price     Int      // Giá tại thời điểm mua
+model Review {
+  id String @id @default(uuid())
+
+  rating Int // 1-5 stars
+  comment String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([orderId])
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // One review per user per course
   @@index([courseId])
-  @@map("order_item")
-}
-
-model Payment {
-  id              String        @id @default(uuid())
-  orderId         String
-  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  userId          String
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount          String
-  method          PaymentMethod
-  status          PaymentStatus @default(Pending)
-  transactionId   String?       // ID từ payment gateway (Stripe, PayPal, etc.)
-  paymentIntentId String?       // Stripe payment intent ID
-  receiptUrl      String?       // URL receipt PDF
-  metadata        String?       // JSON metadata
-  paidAt          DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([orderId])
   @@index([userId])
-  @@index([status])
-  @@index([transactionId])
-  @@map("payment")
-}
-
-enum PaymentMethod {
-  Stripe
-  PayPal
-  BankTransfer
-  Cash
-  Other
-}
-
-enum PaymentStatus {
-  Pending
-  Processing
-  Completed
-  Failed
-  Refunded
-  Cancelled
-}
-
-model LessonProgress {
-  id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId      String
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessonId      String
-  lesson        Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  isCompleted   Boolean  @default(false)
-  watchTime     Int      @default(0) // Tổng thời gian đã xem (giây)
-  lastPosition Int      @default(0) // Vị trí cuối cùng đã xem (giây)
-  completedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@unique([userId, lessonId]) // Mỗi user chỉ có một progress record cho mỗi lesson
-  @@index([userId])
-  @@index([courseId])
-  @@index([lessonId])
-  @@index([isCompleted])
-  @@map("lesson_progress")
+  @@map("review")
 }
 
 model Certificate {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
+  
   certificateNumber String @unique
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId      String
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  pdfUrl        String?  // URL đến file PDF certificate
-  pdfKey        String?  // S3 key của file PDF
-  issuedAt      DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  issuedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([userId, courseId]) // Mỗi user chỉ có một certificate cho mỗi course
-  @@index([userId])
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // One certificate per user per course
   @@index([courseId])
+  @@index([userId])
   @@index([certificateNumber])
   @@map("certificate")
 }
+

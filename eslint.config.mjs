@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  { ignores: ['./lib/generated/**'] }
 ]);
 
 export default eslintConfig;
