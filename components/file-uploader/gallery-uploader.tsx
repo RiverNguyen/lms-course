@@ -221,7 +221,7 @@ const GalleryUploader = ({
         });
 
         if (!presignedResponse.ok) {
-          toast.error("Failed to get presigned URL");
+          toast.error("Không thể lấy URL được ký");
           setItems((prev) =>
             prev.map((item) =>
               item.id === itemId
@@ -264,7 +264,7 @@ const GalleryUploader = ({
                     : item
                 )
               );
-              toast.success("File uploaded successfully");
+              toast.success("Tệp đã được tải lên thành công");
               resolve();
             } else {
               reject(new Error("Failed to upload file"));
@@ -273,7 +273,7 @@ const GalleryUploader = ({
 
           xhr.onerror = () => {
             reject(new Error("Failed to upload file"));
-            toast.error("Failed to upload file");
+            toast.error("Không thể tải lên tệp");
           };
 
           xhr.open("PUT", presignedUrl);
@@ -304,7 +304,7 @@ const GalleryUploader = ({
 
       if (filesToAdd.length < acceptedFiles.length) {
         toast.warning(
-          `Only ${remainingSlots} file(s) can be added. Maximum ${maxFiles} files allowed.`
+          `Chỉ có thể thêm ${remainingSlots} tệp. Tối đa ${maxFiles} tệp được phép.`
         );
       }
 
@@ -354,7 +354,7 @@ const GalleryUploader = ({
         });
 
         if (!res.ok) {
-          toast.error("Failed to delete file");
+          toast.error("Không thể xóa tệp");
           setItems((prev) =>
             prev.map((i) =>
               i.id === id ? { ...i, isDeleting: false, error: true } : i
@@ -370,7 +370,7 @@ const GalleryUploader = ({
       }
 
       setItems((prev) => prev.filter((i) => i.id !== id));
-      toast.success("File deleted successfully");
+      toast.success("Tệp đã được xóa thành công");
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete file");
@@ -398,8 +398,7 @@ const GalleryUploader = ({
 
       if (invalidType) {
         toast.error(
-          `Only ${fileTypeAccepted === "image" ? "images" : "videos"
-          } are allowed`
+          `Chỉ cho phép ${fileTypeAccepted === "image" ? "hình ảnh" : "video"}`
         );
       }
 
@@ -411,7 +410,7 @@ const GalleryUploader = ({
       }
 
       if (tooManyFiles) {
-        toast.error("Too many files selected");
+        toast.error("Đã chọn quá nhiều tệp");
       }
     }
   };
@@ -533,7 +532,7 @@ const GalleryUploader = ({
                       />
                     </div>
                     <p className="text-sm font-semibold text-foreground">
-                      {isDragActive ? "Drop files here" : "Add more"}
+                      {isDragActive ? "Thả tệp vào đây" : "Thêm nữa"}
                     </p>
                   </div>
                   <input {...getInputProps()} />
@@ -567,7 +566,7 @@ const GalleryUploader = ({
 
       {!canAddMore && (
         <p className="text-sm text-muted-foreground text-center">
-          Maximum {maxFiles} files reached
+          Đã đạt tối đa {maxFiles} tệp
         </p>
       )}
     </div>

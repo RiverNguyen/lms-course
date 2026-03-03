@@ -5,6 +5,7 @@ import NewLessonModal from "@/app/admin/courses/[courseId]/edit/_components/new-
 import {
   ReorderChapters,
   ReorderLessons,
+  CreateCourseStructureFromAI,
 } from "@/app/admin/courses/[courseId]/edit/action";
 import { AdminCourseSingleType } from "@/app/data/admin/admin-get-course";
 import { Button } from "@/components/ui/button";
@@ -33,10 +34,27 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ChevronDown, FileTextIcon, GripVerticalIcon } from "lucide-react";
+import {
+  ChevronDown,
+  FileTextIcon,
+  GripVerticalIcon,
+  SparklesIcon,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { tryCatch } from "@/hooks/try-catch";
 import DeleteChapter from "./delete-chapter";
 import DeleteLesson from "./delete-lesson";
 
@@ -55,6 +73,11 @@ interface SortableItemProps {
 }
 
 const CourseStructure = ({ data }: CourseStructureProps) => {
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiDescription, setAiDescription] = useState("");
+  const [isPending, startTransition] = useTransition();
+
   const initialItems = data.chapters.map((chapter) => ({
     id: chapter.id,
     title: chapter.title,
@@ -284,6 +307,62 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
     );
   };
 
+  const handleAiStructureSuggest = async () => {
+    if (!aiDescription.trim() && !data.title) {
+      toast.error("Vui lòng nhập mô tả khóa học hoặc tiêu đề khóa học");
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/admin/course-structure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseDescription: aiDescription || data.smallDescription || "",
+          courseTitle: data.title || "",
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: "Lỗi không xác định" }));
+        throw new Error(error.error || "Lỗi khi gọi AI");
+      }
+
+      const structure = await res.json();
+
+      if (!structure.chapters || structure.chapters.length === 0) {
+        throw new Error("AI không trả về cấu trúc hợp lệ");
+      }
+
+      // Create structure using server action
+      startTransition(async () => {
+        const { data: result, error } = await tryCatch(
+          CreateCourseStructureFromAI(data.id, structure)
+        );
+
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+
+        if (result.status === "success") {
+          toast.success(result.message);
+          setAiDialogOpen(false);
+          setAiDescription("");
+          // Page will auto-refresh via revalidatePath in the action
+          window.location.reload();
+        } else if (result.status === "error") {
+          toast.error(result.message);
+        }
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Lỗi khi gọi AI");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <DndContext
       collisionDetection={rectIntersection}
@@ -292,8 +371,72 @@ const CourseStructure = ({ data }: CourseStructureProps) => {
     >
       <Card>
         <CardHeader className="flex flex-row items-center justify-between border-b border-border">
-          <CardTitle>Chapters</CardTitle>
-          <NewChapterModal courseId={data.id} />
+          <CardTitle>Chương</CardTitle>
+          <div className="flex items-center gap-2">
+            <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+              <DialogTrigger asChild>
+                <Button type="button" variant="outline" size="sm" className="gap-2">
+                  <SparklesIcon className="size-4" />
+                  Gợi ý cấu trúc AI
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Gợi ý cấu trúc chương + bài bằng AI</DialogTitle>
+                  <DialogDescription>
+                    Nhập mô tả khóa học (hoặc để trống để dùng tiêu đề/mô tả hiện
+                    tại), AI sẽ đề xuất cấu trúc chương và bài học.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-medium mb-1">Tiêu đề khóa: {data.title}</p>
+                    {data.smallDescription && (
+                      <p className="text-xs">Mô tả ngắn: {data.smallDescription}</p>
+                    )}
+                  </div>
+                  <Textarea
+                    placeholder="Nhập mô tả chi tiết khóa học (tùy chọn)..."
+                    value={aiDescription}
+                    onChange={(e) => setAiDescription(e.target.value)}
+                    className="min-h-[120px]"
+                    disabled={aiLoading || isPending}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setAiDialogOpen(false);
+                      setAiDescription("");
+                    }}
+                    disabled={aiLoading || isPending}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleAiStructureSuggest}
+                    disabled={aiLoading || isPending}
+                  >
+                    {aiLoading || isPending ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin mr-2" />
+                        Đang tạo...
+                      </>
+                    ) : (
+                      <>
+                        <SparklesIcon className="size-4 mr-2" />
+                        Tạo cấu trúc
+                      </>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <NewChapterModal courseId={data.id} />
+          </div>
         </CardHeader>
         <CardContent className="space-y-8">
           <SortableContext items={items} strategy={verticalListSortingStrategy}>

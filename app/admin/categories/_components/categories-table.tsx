@@ -90,6 +90,8 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
   })
   const [rowSelection, setRowSelection] = React.useState({})
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [deleteErrorDialogOpen, setDeleteErrorDialogOpen] = React.useState(false)
+  const [categoryToDelete, setCategoryToDelete] = React.useState<AdminCategoryType | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -123,7 +125,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
+          aria-label="Chọn dòng"
         />
       ),
       header: ({ table }) => (
@@ -133,7 +135,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label="Chọn tất cả"
         />
       ),
     },
@@ -146,7 +148,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Name
+            Tên
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -166,7 +168,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
     },
     {
       accessorKey: "description",
-      header: "Description",
+      header: "Mô tả",
       cell: ({ row }) => {
         const description = row.getValue("description") as string | null
         return (
@@ -176,7 +178,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
                 {description}
               </p>
             ) : (
-              <span className="text-sm text-muted-foreground italic">No description</span>
+              <span className="text-sm text-muted-foreground italic">Không có mô tả</span>
             )}
           </div>
         )
@@ -214,7 +216,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
             <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">{count}</span>
             <span className="text-xs text-muted-foreground">
-              {count === 1 ? "course" : "courses"}
+              khóa học
             </span>
           </div>
         )
@@ -229,7 +231,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Created
+            Ngày tạo
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -252,7 +254,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Updated
+            Cập nhật
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -276,25 +278,33 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Mở menu</span>
                 <MoreHorizontalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
               <DropdownMenuItem asChild>
                 <Link href={`/admin/categories/${category.id}/edit`}>
                   <PencilIcon className="mr-2 h-4 w-4" />
-                  Edit Category
+                  Chỉnh sửa Danh mục
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={() => router.push(`/admin/categories/${category.id}/delete`)}
+                onClick={() => {
+                  // Check if category has courses
+                  if (category._count.courses > 0) {
+                    setCategoryToDelete(category)
+                    setDeleteErrorDialogOpen(true)
+                  } else {
+                    router.push(`/admin/categories/${category.id}/delete`)
+                  }
+                }}
               >
                 <Trash2Icon className="mr-2 h-4 w-4" />
-                Delete Category
+                Xóa Danh mục
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -358,7 +368,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
           <div className="relative flex-1 max-w-sm">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search categories..."
+              placeholder="Tìm kiếm danh mục..."
               value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
@@ -371,7 +381,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
         {selectedRows.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground">
-              {selectedRows.length} selected
+              {selectedRows.length} đã chọn
             </span>
             <Button
               variant="outline"
@@ -380,7 +390,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
               disabled={isPending}
             >
               <Trash2Icon className="mr-2 h-4 w-4" />
-              Delete Selected
+              Xóa đã chọn
             </Button>
           </div>
         )}
@@ -430,7 +440,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No categories found.
+                  Không tìm thấy danh mục nào.
                 </TableCell>
               </TableRow>
             )}
@@ -441,17 +451,17 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {table.getRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} categor{table.getFilteredRowModel().rows.length === 1 ? "y" : "ies"}
+          Hiển thị {table.getRowModel().rows.length} trong{" "}
+          {table.getFilteredRowModel().rows.length} danh mục
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span className="ml-2">
-              ({table.getFilteredSelectedRowModel().rows.length} selected)
+              ({table.getFilteredSelectedRowModel().rows.length} đã chọn)
             </span>
           )}
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <span className="text-sm text-muted-foreground">Dòng mỗi trang:</span>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -478,10 +488,10 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
               disabled={!table.getCanPreviousPage()}
             >
               <ChevronLeftIcon className="h-4 w-4" />
-              Previous
+              Trước
             </Button>
             <div className="text-sm text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              Trang {table.getState().pagination.pageIndex + 1} /{" "}
               {table.getPageCount()}
             </div>
             <Button
@@ -490,7 +500,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              Sau
               <ChevronRightIcon className="h-4 w-4" />
             </Button>
           </div>
@@ -501,26 +511,47 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete{" "}
-              <strong>{selectedRows.length}</strong> categor{selectedRows.length === 1 ? "y" : "ies"}.
+              Hành động này không thể hoàn tác. Sẽ xóa vĩnh viễn{" "}
+              <strong>{selectedRows.length}</strong> danh mục.
               {selectedRows.some((row) => row.original._count.courses > 0) && (
                 <span className="block mt-2 text-destructive">
-                  Warning: Some categories have courses associated with them. The courses will not be deleted, but their category will be set to null.
+                  Cảnh báo: Một số danh mục có khóa học liên kết. Khóa học sẽ không bị xóa, nhưng danh mục của chúng sẽ được đặt về null.
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Error Dialog - Category has courses */}
+      <AlertDialog open={deleteErrorDialogOpen} onOpenChange={setDeleteErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Không thể xóa danh mục</AlertDialogTitle>
+            <AlertDialogDescription>
+              Danh mục <strong>{categoryToDelete?.name}</strong> không thể xóa vì có{" "}
+              <strong>{categoryToDelete?._count.courses}</strong> khóa học.
+              <span className="block mt-2 text-destructive">
+                Vui lòng xóa hết các khóa học trong danh mục này trước khi xóa danh mục.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setDeleteErrorDialogOpen(false)}>
+              Đã hiểu
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

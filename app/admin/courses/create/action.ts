@@ -32,12 +32,12 @@ export const CreateCourse = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "You are a bot!",
+          message: "Bạn là bot!",
         };
       }
     }
@@ -46,7 +46,7 @@ export const CreateCourse = async (
     if (!validation.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
@@ -54,8 +54,8 @@ export const CreateCourse = async (
       name: validation.data.title,
       description: validation.data.smallDescription,
       default_price_data: {
-        currency: 'usd',
-        unit_amount: Number(validation.data.price) * 100,
+        currency: 'vnd',
+        unit_amount: Number(validation.data.price),
       },
       images: [`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${validation.data.fileKey}`],
     })
@@ -77,14 +77,24 @@ export const CreateCourse = async (
       },
     });
 
+    // Thông báo "Khóa mới" khi tạo khóa với trạng thái Published
+    if (validation.data.status === "Published") {
+      const { notifyNewCourse } = await import(
+        "@/app/data/notification/notification-service"
+      );
+      notifyNewCourse(validation.data.title, validation.data.slug).catch(
+        (err) => console.error("notifyNewCourse failed:", err)
+      );
+    }
+
     return {
       status: "success",
-      message: "Course created successfully",
+      message: "Khóa học đã được tạo thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

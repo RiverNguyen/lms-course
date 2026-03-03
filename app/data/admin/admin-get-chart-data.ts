@@ -235,7 +235,7 @@ export const adminGetCoursesByCategoryData = async () => {
   });
   
   const grouped = courses.reduce((acc, course) => {
-    const categoryName = course.category?.name || "Uncategorized";
+    const categoryName = course.category?.name || "Chưa phân loại";
     acc[categoryName] = (acc[categoryName] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

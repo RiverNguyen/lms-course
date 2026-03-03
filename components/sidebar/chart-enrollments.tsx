@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -35,15 +34,15 @@ type TimeRange = "7d" | "30d" | "90d" | "1y"
 
 const chartConfig = {
   total: {
-    label: "Total",
+    label: "Tổng",
     color: "hsl(221 83% 53%)",
   },
   active: {
-    label: "Active",
+    label: "Đang học",
     color: "hsl(142 76% 36%)",
   },
   completed: {
-    label: "Completed",
+    label: "Hoàn thành",
     color: "hsl(38 92% 50%)",
   },
 } satisfies ChartConfig
@@ -53,15 +52,9 @@ type ChartEnrollmentsProps = {
 }
 
 export function ChartEnrollments({ initialData }: ChartEnrollmentsProps) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState<TimeRange>("90d")
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("7d")
   const [data, setData] = React.useState(initialData)
 
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("7d")
-    }
-  }, [isMobile])
 
   // Note: For dynamic time range updates, you would need to implement API routes
   // For now, we'll filter the initial data based on timeRange
@@ -90,12 +83,12 @@ export function ChartEnrollments({ initialData }: ChartEnrollmentsProps) {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Course Enrollments</CardTitle>
+        <CardTitle>Ghi danh khóa học</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Number of course enrollments over time
+            Số lượng ghi danh khóa học theo thời gian
           </span>
-          <span className="@[540px]/card:hidden">Enrollments over time</span>
+          <span className="@[540px]/card:hidden">Ghi danh theo thời gian</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -105,31 +98,31 @@ export function ChartEnrollments({ initialData }: ChartEnrollmentsProps) {
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
           >
-            <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
-            <ToggleGroupItem value="30d">30 days</ToggleGroupItem>
-            <ToggleGroupItem value="90d">90 days</ToggleGroupItem>
-            <ToggleGroupItem value="1y">1 year</ToggleGroupItem>
+            <ToggleGroupItem value="7d">7 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="30d">30 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="90d">90 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="1y">1 năm</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select time range"
+              aria-label="Chọn khoảng thời gian"
             >
-              <SelectValue placeholder="90 days" />
+              <SelectValue placeholder="7 ngày" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="7d" className="rounded-lg">
-                7 days
+                7 ngày
               </SelectItem>
               <SelectItem value="30d" className="rounded-lg">
-                30 days
+                30 ngày
               </SelectItem>
               <SelectItem value="90d" className="rounded-lg">
-                90 days
+                90 ngày
               </SelectItem>
               <SelectItem value="1y" className="rounded-lg">
-                1 year
+                1 năm
               </SelectItem>
             </SelectContent>
           </Select>
@@ -188,7 +181,7 @@ export function ChartEnrollments({ initialData }: ChartEnrollmentsProps) {
                 minTickGap={32}
                 tickFormatter={(value) => {
                   const date = new Date(value)
-                  return date.toLocaleDateString("en-US", {
+                  return date.toLocaleDateString("vi-VN", {
                     month: "short",
                     day: "numeric",
                   })
@@ -199,7 +192,7 @@ export function ChartEnrollments({ initialData }: ChartEnrollmentsProps) {
                 content={
                   <ChartTooltipContent
                     labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
+                      return new Date(value).toLocaleDateString("vi-VN", {
                         month: "long",
                         day: "numeric",
                         year: "numeric",

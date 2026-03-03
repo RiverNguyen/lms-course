@@ -5,15 +5,15 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign Up",
-  description: "Create a new TunaLMS account to start your learning journey.",
+  title: "Đăng ký",
+  description: "Tạo tài khoản TunaLMS mới để bắt đầu hành trình học tập của bạn.",
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: "Sign Up - TunaLMS",
-    description: "Create a new TunaLMS account to start your learning journey.",
+    title: "Đăng ký - TunaLMS",
+    description: "Tạo tài khoản TunaLMS mới để bắt đầu hành trình học tập của bạn.",
     url: "/signup",
   },
 };

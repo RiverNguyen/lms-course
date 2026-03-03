@@ -1,6 +1,7 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
-export const getCourseFilters = async () => {
+const getCourseFiltersUncached = async () => {
   // Get categories with course counts
   const categories = await prisma.category.findMany({
     where: {
@@ -115,5 +116,12 @@ export const getCourseFilters = async () => {
     allLevels: totalCount,
   };
 };
+
+/** Cache 1 phút, tag để revalidate khi đổi course/category */
+export const getCourseFilters = unstable_cache(
+  getCourseFiltersUncached,
+  ["course-filters"],
+  { revalidate: 60, tags: ["course-filters"] }
+);
 
 export type CourseFiltersType = Awaited<ReturnType<typeof getCourseFilters>>;

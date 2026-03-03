@@ -58,19 +58,19 @@ const DeleteChapter = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want to delete this chapter?
+            Bạn có chắc chắn muốn xóa chương này?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This chapter and all its lessons will be deleted permanently.
+            Chương này và tất cả bài học trong đó sẽ bị xóa vĩnh viễn.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Hủy</AlertDialogCancel>
           <AlertDialogAction onClick={onDelete} disabled={isPending}>
             {isPending ? (
               <Loader2Icon className="size-4 animate-spin" />
             ) : (
-              "Delete"
+              "Xóa"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

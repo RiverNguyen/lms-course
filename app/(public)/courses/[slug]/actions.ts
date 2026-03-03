@@ -33,7 +33,7 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
     if (desision.isDenied()) {
       return {
         status: 'error',
-        message: 'You are a bot!'
+        message: 'Bạn là bot!'
       }
     }
 
@@ -53,14 +53,14 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
     if (!course) {
       return {
         status: 'error',
-        message: 'Course not found'
+        message: 'Không tìm thấy khóa học'
       }
     }
 
     if (!course.stripePriceId) {
       return {
         status: 'error',
-        message: 'Course price is not configured. Please contact support.'
+        message: 'Giá khóa học chưa được cấu hình. Vui lòng liên hệ hỗ trợ.'
       }
     }
 
@@ -116,7 +116,7 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
       if (existingEnrollment?.status === 'Active' || existingEnrollment?.status === 'Completed') {
         return {
           status: 'success',
-          message: 'You are already enrolled in this course'
+          message: 'Bạn đã đăng ký khóa học này rồi'
         }
       }
 
@@ -180,7 +180,7 @@ export const enrollInCourseAction = async (courseId: string): Promise<ApiRespons
 
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Lỗi không xác định'
     }
   }
 
@@ -211,7 +211,7 @@ export const createReviewAction = async (
     if (!enrollment || (enrollment.status !== 'Active' && enrollment.status !== 'Completed')) {
       return {
         status: 'error',
-        message: 'You must enroll in this course before leaving a review'
+        message: 'Bạn phải đăng ký khóa học này trước khi để lại đánh giá'
       };
     }
 
@@ -219,7 +219,7 @@ export const createReviewAction = async (
     if (rating < 1 || rating > 5) {
       return {
         status: 'error',
-        message: 'Rating must be between 1 and 5'
+        message: 'Đánh giá phải từ 1 đến 5 sao'
       };
     }
 
@@ -236,7 +236,7 @@ export const createReviewAction = async (
     if (existingReview) {
       return {
         status: 'error',
-        message: 'You have already reviewed this course. You can update your existing review instead.'
+        message: 'Bạn đã đánh giá khóa học này rồi. Bạn có thể cập nhật đánh giá hiện có của mình.'
       };
     }
 
@@ -252,13 +252,13 @@ export const createReviewAction = async (
 
     return {
       status: 'success',
-      message: 'Review submitted successfully'
+      message: 'Đánh giá đã được gửi thành công'
     };
   } catch (error) {
     console.error('Error creating review:', error);
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Failed to create review'
+      message: error instanceof Error ? error.message : 'Không thể tạo đánh giá'
     };
   }
 };
@@ -275,7 +275,7 @@ export const updateReviewAction = async (
     if (rating < 1 || rating > 5) {
       return {
         status: 'error',
-        message: 'Rating must be between 1 and 5'
+        message: 'Đánh giá phải từ 1 đến 5 sao'
       };
     }
 
@@ -289,14 +289,14 @@ export const updateReviewAction = async (
     if (!review) {
       return {
         status: 'error',
-        message: 'Review not found'
+        message: 'Không tìm thấy đánh giá'
       };
     }
 
     if (review.userId !== user.id) {
       return {
         status: 'error',
-        message: 'You can only update your own reviews'
+        message: 'Bạn chỉ có thể cập nhật đánh giá của chính mình'
       };
     }
 
@@ -319,7 +319,7 @@ export const updateReviewAction = async (
     console.error('Error updating review:', error);
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Failed to update review'
+      message: error instanceof Error ? error.message : 'Không thể cập nhật đánh giá'
     };
   }
 };
@@ -340,14 +340,14 @@ export const deleteReviewAction = async (
     if (!review) {
       return {
         status: 'error',
-        message: 'Review not found'
+        message: 'Không tìm thấy đánh giá'
       };
     }
 
     if (review.userId !== user.id) {
       return {
         status: 'error',
-        message: 'You can only delete your own reviews'
+        message: 'Bạn chỉ có thể xóa đánh giá của chính mình'
       };
     }
 
@@ -360,13 +360,13 @@ export const deleteReviewAction = async (
 
     return {
       status: 'success',
-      message: 'Review deleted successfully'
+      message: 'Đánh giá đã được xóa thành công'
     };
   } catch (error) {
     console.error('Error deleting review:', error);
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Failed to delete review'
+      message: error instanceof Error ? error.message : 'Không thể xóa đánh giá'
     };
   }
 };

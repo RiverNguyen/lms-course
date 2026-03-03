@@ -1,4 +1,6 @@
 import { getLessonContent } from "@/app/data/course/get-lesson-content";
+import { getLessonNote } from "@/app/data/course/get-lesson-notes";
+import { getLessonBookmarks } from "@/app/data/course/get-lesson-bookmarks";
 import CourseContent from "./_components/course-content";
 import CourseContentSkeleton from "./_components/course-content-skeleton";
 import { Suspense } from "react";
@@ -35,20 +37,28 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function LessonPage({ params }: { params: Params }) {
-  const { lessonId } = await params;
+  const { lessonId, slug } = await params;
 
   return (
     <Suspense fallback={<CourseContentSkeleton />}>
-      <LessonPageLoader lessonId={lessonId} />
+      <LessonPageLoader lessonId={lessonId} slug={slug} />
     </Suspense>
   )
 }
 
-async function LessonPageLoader({ lessonId }: { lessonId: string }) {
-  const lesson = await getLessonContent(lessonId);
+async function LessonPageLoader({ lessonId, slug }: { lessonId: string; slug: string }) {
+  const [lesson, initialNote, initialBookmarks] = await Promise.all([
+    getLessonContent(lessonId),
+    getLessonNote(lessonId),
+    getLessonBookmarks(lessonId),
+  ]);
 
   return (
-    <CourseContent data={lesson} />
+    <CourseContent
+      data={lesson}
+      slug={slug}
+      initialNote={initialNote}
+      initialBookmarks={initialBookmarks}
+    />
   )
-
 }

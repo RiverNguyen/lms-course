@@ -20,8 +20,16 @@ const CoursePagination = ({
   const handlePageClick = (event: { selected: number }) => {
     const params = new URLSearchParams(searchParams.toString());
     const newPage = event.selected + 1; // react-paginate uses 0-based index
-    params.set("page", newPage.toString());
-    router.push(`${pathname}?${params.toString()}`);
+    if (newPage === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", newPage.toString());
+    }
+    const newQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (newQuery !== currentQuery) {
+      router.push(newQuery ? `${pathname}?${newQuery}` : pathname);
+    }
   };
 
   if (totalPages <= 1) return null;

@@ -54,7 +54,7 @@ const VerifyRequestForm = () => {
             } catch (error) {
               console.error("Error checking banned status:", error);
             }
-            toast.success("Email verified successfully");
+            toast.success("Email đã được xác minh thành công");
             router.push("/");
           },
           onError: (error) => {
@@ -70,10 +70,10 @@ const VerifyRequestForm = () => {
   return (
     <Card className="w-full mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Please check your email</CardTitle>
+        <CardTitle className="text-xl">Vui lòng kiểm tra email của bạn</CardTitle>
         <CardDescription>
-          We&apos;ve sent a verification code to your email. Please check your
-          email and enter the code to verify your email.
+          Chúng tôi đã gửi mã xác minh đến email của bạn. Vui lòng kiểm tra email
+          và nhập mã để xác minh email của bạn.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -97,7 +97,7 @@ const VerifyRequestForm = () => {
             </InputOTPGroup>
           </InputOTP>
           <p className="text-sm text-muted-foreground">
-            Enter the 6-digit code sent to your email
+            Nhập mã 6 chữ số đã được gửi đến email của bạn
           </p>
         </div>
         <Button
@@ -125,9 +125,9 @@ const VerifyRequestPage = () => {
       fallback={
         <Card className="w-full mx-auto">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">Loading verification...</CardTitle>
+            <CardTitle className="text-xl">Đang tải xác minh...</CardTitle>
             <CardDescription>
-              Preparing your verification form, please wait.
+              Đang chuẩn bị form xác minh của bạn, vui lòng đợi.
             </CardDescription>
           </CardHeader>
         </Card>

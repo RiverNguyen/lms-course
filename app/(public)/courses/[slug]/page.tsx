@@ -1,6 +1,7 @@
 import { getIndividualCourse } from "@/app/data/course/get-course";
 import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
 import { getCourseReviews } from "@/app/data/course/get-course-reviews";
+import { getWishlistCourseIds } from "@/app/data/wishlist/get-wishlist-course-ids";
 import { getUserReviewForCourse } from "./actions";
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
-import { env } from "@/lib/env";
+import { getCourseImageUrl } from "@/hooks/use-construct-url";
 import {
   IconBook2,
   IconCategory2,
@@ -22,11 +23,14 @@ import {
   IconClock,
   IconClock24,
   IconPlayerPlay,
+  IconUsers,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { EnrollmentButton } from "./_components/enrollment-button";
 import { AddToCartButton } from "./_components/add-to-cart-button";
+import { CoursePreviewDialog } from "./_components/course-preview-dialog";
+import { WishlistButton } from "@/app/(public)/_components/wishlist-button";
 import { buttonVariants } from "@/components/ui/button";
 import type { Metadata } from "next";
 
@@ -43,9 +47,14 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     };
   }
 
-  const courseImage = `https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${course.fileKey}`;
+  const courseImage = getCourseImageUrl(course.fileKey);
   const courseUrl = `/courses/${slug}`;
-  const description = course.smallDescription || `Learn ${course.title} with our comprehensive course. ${course.duration} hours of content, ${course.level} level.`;
+  const levelLabels: Record<string, string> = {
+    Beginner: "Người mới bắt đầu",
+    Intermediate: "Trung cấp",
+    Advanced: "Nâng cao",
+  };
+  const description = course.smallDescription || `Học ${course.title} với khóa học toàn diện của chúng tôi. ${course.duration} giờ nội dung, trình độ ${levelLabels[course.level] || course.level}.`;
 
   return {
     title: course.title,
@@ -90,8 +99,12 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
 
   const course = await getIndividualCourse(slug);
 
-  const isEnrolled = await checkIfCourseBought(course?.id);
-  
+  const [isEnrolled, wishlistCourseIds] = await Promise.all([
+    checkIfCourseBought(course?.id),
+    getWishlistCourseIds(),
+  ]);
+  const inWishlist = course?.id ? wishlistCourseIds.includes(course.id) : false;
+
   // Get reviews data
   const reviewsData = await getCourseReviews(course?.id);
   let userReview = null;
@@ -106,8 +119,14 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
         <div className="order-1 lg:col-span-2">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
+            <WishlistButton
+              courseId={course?.id}
+              initialInWishlist={inWishlist}
+              variant="icon-on-card"
+              className="absolute top-4 left-4 z-10"
+            />
             <Image
-              src={`https://${env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGE}.t3.storage.dev/${course?.fileKey}`}
+              src={getCourseImageUrl(course?.fileKey)}
               alt={course?.title}
               fill
               className="object-cover"
@@ -132,11 +151,11 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
               </Badge>
               <Badge className="flex items-center gap-1 px-3 py-1">
                 <IconCategory2 className="size-4" />
-                <span>{course?.category?.name || "Uncategorized"}</span>
+                <span>{course?.category?.name || "Chưa phân loại"}</span>
               </Badge>
               <Badge className="flex items-center gap-1 px-3 py-1">
                 <IconClock24 className="size-4" />
-                <span>{course?.duration} hours</span>
+                <span>{course?.duration} giờ</span>
               </Badge>
             </div>
 
@@ -144,31 +163,40 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
 
             <div className="space-y-6">
               <h2 className="text-3xl font-semibold tracking-tight">
-                Course Description
+                Mô tả khóa học
               </h2>
-              <RenderDescription description={JSON.parse(course?.description)} />
+              <RenderDescription
+                description={
+                  (() => {
+                    const d = course?.description;
+                    if (!d) return {};
+                    if (typeof d !== "string") return d;
+                    const t = d.trim();
+                    if (t.startsWith("<")) return d;
+                    try {
+                      return JSON.parse(d);
+                    } catch {
+                      return d;
+                    }
+                  })()
+                }
+              />
             </div>
           </div>
 
           <div className="mt-12 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-semibold tracking-tight">
-                Course Content
+                Nội dung khóa học
               </h2>
               <div className="">
-                {course?.chapters.length} Chapter
-                {course?.chapters.length > 1 ? "s" : ""} |{" "}
+                {course?.chapters.length} Chương
+                {course?.chapters.length > 1 ? "" : ""} |{" "}
                 {course?.chapters.reduce(
                   (acc, chapter) => acc + chapter.lessons.length,
                   0
                 ) || 0}{" "}
-                Lesson
-                {course?.chapters.reduce(
-                  (acc, chapter) => acc + chapter.lessons.length,
-                  0
-                ) > 1
-                  ? "s"
-                  : ""}
+                Bài học
               </div>
             </div>
 
@@ -189,8 +217,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                                   {chapter.title}
                                 </h3>
                                 <p className="text-sm text-muted-foreground mt-1 text-left">
-                                  {chapter.lessons.length} Lesson
-                                  {chapter.lessons.length > 1 ? "s" : ""}
+                                  {chapter.lessons.length} Bài học
                                 </p>
                               </div>
                             </div>
@@ -223,7 +250,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                                   {lesson.title}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  Lesson {index + 1}
+                                  Bài học {index + 1}
                                 </p>
                               </div>
                             </div>
@@ -251,26 +278,26 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
             <Card className="py-0">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-lg font-medium">Price:</span>
+                  <span className="text-lg font-medium">Giá:</span>
                   <span className="text-2xl font-bold text-primary">
-                    {new Intl.NumberFormat("en-US", {
+                    {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
-                      currency: "USD",
+                      currency: "VND",
                     }).format(Number(course?.price))}
                   </span>
                 </div>
 
                 <div className="mb-6 space-y-3 rounded-lg bg-muted p-4">
-                  <h4 className="font-medium">What you will get:</h4>
+                  <h4 className="font-medium">Bạn sẽ nhận được:</h4>
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3">
                       <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <IconClock className="size-4" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Course Duration:</p>
+                        <p className="font-medium text-sm">Thời lượng khóa học:</p>
                         <p className="text-sm text-muted-foreground">
-                          {course?.duration} hours
+                          {course?.duration} giờ
                         </p>
                       </div>
                     </div>
@@ -281,7 +308,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                         <IconChartBar className="size-4" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Course Level:</p>
+                        <p className="font-medium text-sm">Trình độ khóa học:</p>
                         <p className="text-sm text-muted-foreground">
                           {course?.level}
                         </p>
@@ -294,7 +321,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                         <IconCategory2 className="size-4" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Course Category:</p>
+                        <p className="font-medium text-sm">Danh mục khóa học:</p>
                         <p className="text-sm text-muted-foreground">
                           {course?.category?.name}
                         </p>
@@ -307,7 +334,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                         <IconBook2 className="size-4" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Total Lessons:</p>
+                        <p className="font-medium text-sm">Tổng số bài học:</p>
                         <p className="text-sm text-muted-foreground">
                           {course?.chapters.reduce(
                             (acc, chapter) => acc + chapter.lessons.length,
@@ -317,37 +344,53 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                       </div>
                     </div>
                   </div>
+                  {"_count" in course && course._count?.enrollments != null && (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <IconUsers className="size-4" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Học viên đang học:</p>
+                          <p className="text-sm text-muted-foreground">
+                            {course._count.enrollments} người
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-6 space-y-3">
-                  <h4>This course includes:</h4>
+                  <h4>Khóa học này bao gồm:</h4>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2 text-sm">
                       <div className="rounded-full bg-green-500/10 text-green-500">
                         <IconCheck className="size-3" />
                       </div>
-                      <span>Full lifetime access</span>
+                      <span>Truy cập trọn đời</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="rounded-full bg-green-500/10 text-green-500">
                         <IconCheck className="size-3" />
                       </div>
-                      <span>Access on mobile and desktop</span>
+                      <span>Truy cập trên điện thoại và máy tính</span>
                     </li>
                     <li className="flex items-center gap-2 text-sm">
                       <div className="rounded-full bg-green-500/10 text-green-500">
                         <IconCheck className="size-3" />
                       </div>
-                      <span>Certificate of completion</span>
+                      <span>Chứng chỉ hoàn thành</span>
                     </li>
                   </ul>
                 </div>
 
 
                 {isEnrolled ? (
-                  <Link href={`/dashboard/${slug}`} className={buttonVariants({ className: 'w-full' })}>Watch Course</Link>
+                  <Link href={`/dashboard/${slug}`} className={buttonVariants({ className: 'w-full' })}>Xem khóa học</Link>
                 ) : (
                   <div className="space-y-2">
+                    <CoursePreviewDialog course={course} isEnrolled={isEnrolled} />
                     <EnrollmentButton courseId={course?.id} />
                     <AddToCartButton
                       courseId={course?.id}
@@ -359,7 +402,7 @@ export default async function CourseDetailPage({ params }: { params: Params }) {
                   </div>
                 )}
                 <p className="mt-3 text-center text-xs text-muted-foreground">
-                  30-day money-back guarantee
+                  Đảm bảo hoàn tiền trong 30 ngày
                 </p>
               </CardContent>
             </Card>

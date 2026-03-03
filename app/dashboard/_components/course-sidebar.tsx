@@ -55,7 +55,7 @@ export default function CourseSidebar({ course }: CourseSidebarProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Progress</span>
-            <span className="font-medium">{completedLessons}/{totalLessons} lessons</span>
+            <span className="font-medium">{completedLessons}/{totalLessons} bài học</span>
           </div>
           <AnimatedCircularProgressBar max={totalLessons} min={0} value={completedLessons} gaugePrimaryColor="var(--primary)" gaugeSecondaryColor="color-mix(in oklch, var(--primary) 20%, transparent)" className="mx-auto" />
           <p className="text-sm font-medium mt-2 text-center">{progressPercentage}% complete</p>

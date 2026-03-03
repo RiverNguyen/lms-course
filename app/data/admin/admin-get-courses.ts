@@ -20,6 +20,9 @@ export const adminGetCourses = async () => {
       slug: true,
       createdAt: true,
       updatedAt: true,
+      _count: {
+        select: { enrollments: true },
+      },
     },
   });
 

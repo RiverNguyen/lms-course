@@ -19,11 +19,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TunaLMS - Online Learning Management System",
+    default: "TunaLMS - Hệ thống Quản lý Học tập Trực tuyến",
     template: "%s | TunaLMS",
   },
-  description: "Discover a modern, interactive learning management system. Access high-quality courses anytime, anywhere. Learn from industry experts and elevate your skills with comprehensive online courses.",
-  keywords: ["online learning", "LMS", "courses", "education", "e-learning", "online courses", "learning platform", "skill development"],
+  description: "Khám phá hệ thống quản lý học tập trực tuyến hiện đại và tương tác. Truy cập các khóa học chất lượng cao mọi lúc, mọi nơi. Học từ các chuyên gia hàng đầu và nâng cao kỹ năng với các khóa học trực tuyến toàn diện.",
+  keywords: ["học trực tuyến", "LMS", "khóa học", "giáo dục", "e-learning", "khóa học trực tuyến", "nền tảng học tập", "phát triển kỹ năng"],
   authors: [{ name: "TunaLMS" }],
   creator: "TunaLMS",
   publisher: "TunaLMS",
@@ -40,24 +40,24 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "vi_VN",
     url: "/",
     siteName: "TunaLMS",
-    title: "TunaLMS - Online Learning Management System",
-    description: "Discover a modern, interactive learning management system. Access high-quality courses anytime, anywhere.",
+    title: "TunaLMS - Hệ thống Quản lý Học tập Trực tuyến",
+    description: "Khám phá hệ thống quản lý học tập trực tuyến hiện đại và tương tác. Truy cập các khóa học chất lượng cao mọi lúc, mọi nơi.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "TunaLMS - Online Learning Platform",
+        alt: "TunaLMS - Nền tảng Học tập Trực tuyến",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TunaLMS - Online Learning Management System",
-    description: "Discover a modern, interactive learning management system. Access high-quality courses anytime, anywhere.",
+    title: "TunaLMS - Hệ thống Quản lý Học tập Trực tuyến",
+    description: "Khám phá hệ thống quản lý học tập trực tuyến hiện đại và tương tác. Truy cập các khóa học chất lượng cao mọi lúc, mọi nơi.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -79,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
+    <html lang="vi" suppressHydrationWarning suppressContentEditableWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

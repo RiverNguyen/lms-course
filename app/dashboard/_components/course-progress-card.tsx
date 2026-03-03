@@ -13,6 +13,12 @@ import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const levelLabels: Record<string, string> = {
+  Beginner: "Mới bắt đầu",
+  Intermediate: "Trung cấp",
+  Advanced: "Nâng cao",
+};
+
 interface CourseProgressCardProps {
   data: EnrolledCourseType;
 }
@@ -20,10 +26,11 @@ interface CourseProgressCardProps {
 const CourseProgressCard = ({ data }: CourseProgressCardProps) => {
   const thumbnailUrl = useConstructUrl(data?.course?.fileKey);
   const { totalLessons, completedLessons, progressPercentage } = useCourseProgress({ course: data?.course as any });
+  const levelLabel = data?.course?.level ? levelLabels[data.course.level] ?? data.course.level : "";
 
   return (
     <Card className="group relative py-0 gap-0">
-      <Badge className="absolute top-2 right-2 z-[10]">{data?.course?.level}</Badge>
+      <Badge className="absolute top-2 right-2 z-[10]">{levelLabel}</Badge>
       <Image
         src={thumbnailUrl}
         alt={data?.course?.title}
@@ -45,19 +52,19 @@ const CourseProgressCard = ({ data }: CourseProgressCardProps) => {
 
         <div className="space-y-4 mt-5">
           <div className="flex justify-between mb-1 text-sm">
-            <p>Progress:</p>
+            <p>Tiến trình:</p>
             <p className="font-medium">{progressPercentage}%</p>
           </div>
 
           <Progress value={progressPercentage} className="h-1.5" />
-          <p className="text-sm text-muted-foreground mt-1">{completedLessons}/{totalLessons} lessons</p>
+          <p className="text-sm text-muted-foreground mt-1">{completedLessons}/{totalLessons} bài học</p>
         </div>
 
         <Link
           href={`/dashboard/${data?.course?.slug}`}
           className={buttonVariants({ className: "w-full mt-4" })}
         >
-          Learn More <ArrowRightIcon className="size-4" />
+          Xem chi tiết <ArrowRightIcon className="size-4" />
         </Link>
       </CardContent>
     </Card>

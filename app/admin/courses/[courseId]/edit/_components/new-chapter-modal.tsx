@@ -70,14 +70,14 @@ const NewChapterModal = ({ courseId }: { courseId: string }) => {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
           <PlusIcon className="size-4" />
-          New Chapter
+          Chương mới
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create new chapter</DialogTitle>
+          <DialogTitle>Tạo chương mới</DialogTitle>
           <DialogDescription>
-            Create a new chapter for the course
+            Tạo chương mới cho khóa học
           </DialogDescription>
         </DialogHeader>
 
@@ -88,11 +88,11 @@ const NewChapterModal = ({ courseId }: { courseId: string }) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Tên</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
-                      placeholder="Enter the name of the chapter"
+                      placeholder="Nhập tên chương"
                       {...field}
                     />
                   </FormControl>
@@ -105,11 +105,11 @@ const NewChapterModal = ({ courseId }: { courseId: string }) => {
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Loader2 className="size-4 animate-spin" /> Creating
-                    chapter...
+                    <Loader2 className="size-4 animate-spin" /> Đang tạo
+                    chương...
                   </>
                 ) : (
-                  "Create chapter"
+                  "Tạo chương"
                 )}
               </Button>
             </DialogFooter>

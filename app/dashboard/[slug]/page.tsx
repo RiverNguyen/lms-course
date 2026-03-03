@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: CourseSlugRouteProps): Promis
 
     return {
       title: course.title,
-      description: `Access your enrolled course: ${course.title}. Continue your learning journey.`,
+      description: `Truy cập khóa học đã đăng ký: ${course.title}. Tiếp tục hành trình học tập của bạn.`,
       robots: {
         index: false,
         follow: false,
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: CourseSlugRouteProps): Promis
     };
   } catch {
     return {
-      title: "Course",
+      title: "Khóa học",
       robots: {
         index: false,
         follow: false,
@@ -45,9 +45,9 @@ export default async function CourseSlugRoute({ params }: CourseSlugRouteProps) 
 
   return (
     <div className="flex items-center justify-center h-full text-center">
-      <h2 className="text-2xl font-bold mb-2">No lessons available!</h2>
-      <p className="text-muted-foreground">This course has no lessons yet. Please check back later.</p>
-      <Link href={`/dashboard/${slug}`} className="mt-4 text-primary hover:underline">Go back to course</Link>
+      <h2 className="text-2xl font-bold mb-2">Không có bài học nào!</h2>
+      <p className="text-muted-foreground">Khóa học này chưa có bài học nào. Vui lòng quay lại sau.</p>
+      <Link href={`/dashboard/${slug}`} className="mt-4 text-primary hover:underline">Quay lại khóa học</Link>
     </div>
   )
 }

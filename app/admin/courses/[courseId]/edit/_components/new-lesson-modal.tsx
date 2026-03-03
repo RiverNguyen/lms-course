@@ -79,14 +79,14 @@ const NewLessonModal = ({
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2 w-full justify-center">
           <PlusIcon className="size-4" />
-          New Lesson
+          Bài học mới
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create new lesson</DialogTitle>
+          <DialogTitle>Tạo bài học mới</DialogTitle>
           <DialogDescription>
-            Create a new lesson for the chapter
+            Tạo bài học mới cho chương
           </DialogDescription>
         </DialogHeader>
 
@@ -97,11 +97,11 @@ const NewLessonModal = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Tên</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
-                      placeholder="Enter the name of the lesson"
+                      placeholder="Nhập tên bài học"
                       {...field}
                     />
                   </FormControl>
@@ -114,11 +114,11 @@ const NewLessonModal = ({
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Loader2 className="size-4 animate-spin" /> Creating
-                    lesson...
+                    <Loader2 className="size-4 animate-spin" /> Đang tạo
+                    bài học...
                   </>
                 ) : (
-                  "Create lesson"
+                  "Tạo bài học"
                 )}
               </Button>
             </DialogFooter>

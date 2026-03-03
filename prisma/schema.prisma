@@ -23,9 +23,13 @@ model User {
   courses       Course[]
   enrollments   Enrollment[]
   lessonProgresses LessonProgress[]
+  lessonNotes     LessonNote[]
+  lessonBookmarks LessonBookmark[]
   orders        Order[]
   reviews        Review[]
   certificates  Certificate[]
+  wishlists     Wishlist[]
+  notifications Notification[]
 
   stripeCustomerId String? @unique
 
@@ -114,6 +118,7 @@ model Course {
   enrollments Enrollment[]
   reviews Review[]
   certificates Certificate[]
+  wishlists Wishlist[]
 
 }
 
@@ -156,6 +161,40 @@ model Lesson {
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
   lessonProgresses LessonProgress[]
+  lessonNotes     LessonNote[]
+  lessonBookmarks LessonBookmark[]
+}
+
+model LessonNote {
+  id        String   @id @default(uuid())
+  content   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([lessonId])
+  @@index([userId])
+  @@map("lesson_note")
+}
+
+model LessonBookmark {
+  id        String   @id @default(uuid())
+  timestamp Int      // seconds in video
+  label     String?
+  createdAt DateTime @default(now())
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lessonId])
+  @@map("lesson_bookmark")
 }
 
 model Enrollment {
@@ -215,24 +254,52 @@ model LessonProgress {
   @@unique([userId, lessonId])
 }
 
+model Coupon {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  type            CouponType
+  value           Int       // percent 1-100, or fixed amount in VND
+  minPurchase     Int?      // minimum order amount in VND (optional)
+  maxUses         Int?      // total max redemptions (optional)
+  usedCount       Int       @default(0)
+  startAt         DateTime
+  endAt           DateTime
+  active          Boolean   @default(true)
+  stripeCouponId  String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  orders Order[]
+  @@index([code])
+  @@index([active, startAt, endAt])
+  @@map("coupon")
+}
+
+enum CouponType {
+  Percent
+  Fixed
+}
+
 model Order {
   id String @id @default(uuid())
 
   orderNumber String @unique
   subtotal String
   total String
-
+  discountAmount String? @default("0") // discount applied in VND
   status OrderStatus @default(Pending)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId String?
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  couponId String?
+  coupon Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
 
   orderItems OrderItem[]
-
   @@index([userId])
   @@index([orderNumber])
+  @@index([couponId])
   @@map("order")
 }
 
@@ -244,7 +311,6 @@ model OrderItem {
   courseSlug String
   coursePrice String
   quantity Int
-
   orderId String
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -304,3 +370,41 @@ model Certificate {
   @@map("certificate")
 }
 
+model Wishlist {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("wishlist")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      NotificationType
+  title     String
+  body      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)  // Optional link (course slug, coupon id, etc.)
+  linkUrl String?
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notification")
+}
+
+enum NotificationType {
+  NewCourse
+  CouponExpiring
+  StudyReminder
+}

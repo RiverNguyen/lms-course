@@ -83,14 +83,14 @@ const CategoryCreatePage = () => {
         >
           <ArrowLeftIcon className="size-4" />
         </Link>
-        <h1 className="text-2xl font-bold">Create a new category</h1>
+        <h1 className="text-2xl font-bold">Tạo danh mục mới</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Category Information</CardTitle>
+          <CardTitle>Thông tin Danh mục</CardTitle>
           <CardDescription>
-            Provide information about the category
+            Nhập thông tin về danh mục
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -102,11 +102,11 @@ const CategoryCreatePage = () => {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Tên</FormLabel>
                       <FormControl>
                         <Input
                           disabled={isPending}
-                          placeholder="Enter the name of the category"
+                          placeholder="Nhập tên danh mục"
                           {...field}
                         />
                       </FormControl>
@@ -125,7 +125,7 @@ const CategoryCreatePage = () => {
                         <FormControl>
                           <Input
                             disabled={isPending}
-                            placeholder="Enter the slug of the category"
+                            placeholder="Nhập slug của danh mục"
                             {...field}
                           />
                         </FormControl>
@@ -138,7 +138,7 @@ const CategoryCreatePage = () => {
                     className="w-fit mt-5.5"
                     onClick={generateSlug}
                   >
-                    Generate Slug <SparklesIcon className="ml-1" size={16} />
+                    Tạo Slug <SparklesIcon className="ml-1" size={16} />
                   </Button>
                 </div>
               </div>
@@ -148,10 +148,10 @@ const CategoryCreatePage = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormLabel>Mô tả (Tùy chọn)</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Enter the description of the category"
+                        placeholder="Nhập mô tả của danh mục"
                         className="min-h-[120px]"
                         disabled={isPending}
                         {...field}
@@ -166,11 +166,11 @@ const CategoryCreatePage = () => {
                 {isPending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
-                    Creating category...
+                    Đang tạo danh mục...
                   </>
                 ) : (
                   <>
-                    Create Category <PlusIcon className="ml-1" size={16} />
+                    Tạo Danh mục <PlusIcon className="ml-1" size={16} />
                   </>
                 )}
               </Button>

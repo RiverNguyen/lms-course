@@ -33,12 +33,12 @@ export const banUser = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -46,14 +46,14 @@ export const banUser = async (
     if (!userId) {
       return {
         status: "error",
-        message: "User ID is required",
+        message: "ID người dùng là bắt buộc",
       };
     }
 
     if (!banReason || banReason.trim().length === 0) {
       return {
         status: "error",
-        message: "Ban reason is required",
+        message: "Lý do khóa là bắt buộc",
       };
     }
 
@@ -66,14 +66,14 @@ export const banUser = async (
     if (!user) {
       return {
         status: "error",
-        message: "User not found",
+        message: "Không tìm thấy người dùng",
       };
     }
 
     if (user.role === "admin") {
       return {
         status: "error",
-        message: "Cannot ban admin users",
+        message: "Không thể khóa người dùng quản trị",
       };
     }
 
@@ -180,12 +180,12 @@ export const unbanUser = async (userId: string): Promise<ApiResponse> => {
 
     return {
       status: "success",
-      message: "User unbanned successfully",
+      message: "Người dùng đã được bỏ khóa thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

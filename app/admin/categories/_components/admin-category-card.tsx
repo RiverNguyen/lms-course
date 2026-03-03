@@ -36,14 +36,14 @@ const AdminCategoryCard = ({ category }: AdminCategoryCardProps) => {
             <DropdownMenuItem asChild>
               <Link href={`/admin/categories/${category?.id}/edit`}>
                 <PencilIcon className="size-4 mr-2" />
-                Edit Category
+                Chỉnh sửa Danh mục
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href={`/admin/categories/${category?.id}/delete`}>
                 <Trash2Icon className="size-4 mr-2 text-destructive" />
-                Delete Category
+                Xóa Danh mục
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -68,8 +68,7 @@ const AdminCategoryCard = ({ category }: AdminCategoryCardProps) => {
           <div className="flex items-center gap-x-2">
             <BookOpenIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
             <p className="text-xsm text-muted-foreground">
-              {category?._count.courses} course
-              {category?._count.courses !== 1 ? "s" : ""}
+              {category?._count.courses} khóa học
             </p>
           </div>
         </div>
@@ -86,7 +85,7 @@ const AdminCategoryCard = ({ category }: AdminCategoryCardProps) => {
             className: "w-full mt-4",
           })}
         >
-          Edit Category <ArrowRightIcon className="size-4" />
+          Chỉnh sửa Danh mục <ArrowRightIcon className="size-4" />
         </Link>
       </CardContent>
     </Card>

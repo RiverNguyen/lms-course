@@ -44,16 +44,15 @@ export default function SeedCategoriesPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SparklesIcon className="h-5 w-5" />
-            Seed Sample Categories
+            Tạo Danh mục Mẫu
           </CardTitle>
           <CardDescription>
-            This will create 10 sample categories for your LMS. Categories that
-            already exist will be skipped.
+            Sẽ tạo 10 danh mục mẫu cho LMS của bạn. Các danh mục đã tồn tại sẽ được bỏ qua.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted p-4 rounded-lg">
-            <p className="text-sm font-medium mb-2">Categories to be created:</p>
+            <p className="text-sm font-medium mb-2">Các danh mục sẽ được tạo:</p>
             <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
               <li>Information Technology</li>
               <li>Web Development</li>
@@ -76,12 +75,12 @@ export default function SeedCategoriesPage() {
             {isPending ? (
               <>
                 <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                Creating Categories...
+                Đang tạo Danh mục...
               </>
             ) : (
               <>
                 <SparklesIcon className="mr-2 h-4 w-4" />
-                Create 10 Sample Categories
+                Tạo 10 Danh mục Mẫu
               </>
             )}
           </Button>

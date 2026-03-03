@@ -5,20 +5,20 @@ import { SocialMediaSection } from "./_components/social-media-section";
 import { GoogleMapSection } from "./_components/google-map-section";
 
 export const metadata: Metadata = {
-  title: "Contact Us - TunaLMS | Get in Touch",
+  title: "Liên hệ - TunaLMS | Liên hệ với Chúng tôi",
   description:
-    "Get in touch with TunaLMS. Contact us via email, phone, or visit our office. We're here to help you with any questions about our courses and platform.",
+    "Liên hệ với TunaLMS. Gửi email, gọi điện thoại hoặc đến văn phòng của chúng tôi. Chúng tôi sẵn sàng hỗ trợ bạn với mọi câu hỏi về khóa học và nền tảng của chúng tôi.",
   keywords: [
-    "contact TunaLMS",
-    "LMS support",
-    "online learning contact",
-    "education support",
-    "course inquiry",
+    "liên hệ TunaLMS",
+    "hỗ trợ LMS",
+    "liên hệ học trực tuyến",
+    "hỗ trợ giáo dục",
+    "tư vấn khóa học",
   ],
   openGraph: {
-    title: "Contact TunaLMS - Get in Touch",
+    title: "Liên hệ TunaLMS - Liên hệ với Chúng tôi",
     description:
-      "Get in touch with TunaLMS. Contact us via email, phone, or visit our office.",
+      "Liên hệ với TunaLMS. Gửi email, gọi điện thoại hoặc đến văn phòng của chúng tôi.",
     url: "/contact",
   },
   alternates: {

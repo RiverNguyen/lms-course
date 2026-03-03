@@ -4,15 +4,15 @@ import type { Metadata } from "next";
 import PaymentSuccessContent from "./payment-success-content";
 
 export const metadata: Metadata = {
-  title: "Payment Successful",
-  description: "Your payment has been processed successfully. You can now access your course and start learning.",
+  title: "Thanh toán Thành công",
+  description: "Thanh toán của bạn đã được xử lý thành công. Bạn có thể truy cập khóa học và bắt đầu học ngay.",
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: "Payment Successful - TunaLMS",
-    description: "Your payment has been processed successfully. You can now access your course.",
+    title: "Thanh toán Thành công - TunaLMS",
+    description: "Thanh toán của bạn đã được xử lý thành công. Bạn có thể truy cập khóa học ngay.",
     url: "/payment/success",
   },
 };

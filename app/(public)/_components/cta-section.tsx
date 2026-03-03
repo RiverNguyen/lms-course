@@ -36,7 +36,7 @@ export const CTASection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight"
           >
-            Ready to Start Your Learning Journey?
+            Sẵn sàng Bắt đầu Hành trình Học tập của Bạn?
           </motion.h2>
 
           <motion.p
@@ -46,8 +46,8 @@ export const CTASection = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            Join thousands of students who are already advancing their careers with our comprehensive courses. 
-            Start learning today and unlock your potential.
+            Tham gia cùng hàng nghìn học viên đang phát triển sự nghiệp với các khóa học toàn diện của chúng tôi. 
+            Bắt đầu học ngay hôm nay và khám phá tiềm năng của bạn.
           </motion.p>
 
           <motion.div
@@ -65,7 +65,7 @@ export const CTASection = () => {
                 href="/courses"
                 className={buttonVariants({ size: "lg", className: "group" })}
               >
-                Browse All Courses
+                Duyệt Tất cả Khóa học
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -81,7 +81,7 @@ export const CTASection = () => {
                   className: "group",
                 })}
               >
-                Get Started Free
+                Bắt đầu Miễn phí
               </Link>
             </motion.div>
           </motion.div>

@@ -26,14 +26,14 @@ const CourseCreatePage = async () => {
         >
           <ArrowLeftIcon className="size-4" />
         </Link>
-        <h1 className="text-2xl font-bold">Create a new course</h1>
+        <h1 className="text-2xl font-bold">Tạo khóa học mới</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
+          <CardTitle>Thông tin cơ bản</CardTitle>
           <CardDescription>
-            Provide basic information about the course
+            Nhập thông tin cơ bản về khóa học
           </CardDescription>
         </CardHeader>
         <CardContent>

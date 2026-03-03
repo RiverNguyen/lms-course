@@ -27,7 +27,7 @@ export const RegistrationSection = () => {
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Successfully signed up with Google!");
+            toast.success("Đăng ký thành công với Google!");
             router.push("/");
           },
           onError: (error: { error: { message: string } }) => {
@@ -46,7 +46,7 @@ export const RegistrationSection = () => {
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Successfully signed up with GitHub!");
+            toast.success("Đăng ký thành công với GitHub!");
             router.push("/");
           },
           onError: (error: { error: { message: string } }) => {
@@ -59,7 +59,7 @@ export const RegistrationSection = () => {
 
   const signUpWithEmail = async () => {
     if (!email) {
-      toast.error("Please enter your email");
+      toast.error("Vui lòng nhập email của bạn");
       return;
     }
 
@@ -69,7 +69,7 @@ export const RegistrationSection = () => {
         type: "sign-in", // better-auth emailOTP uses "sign-in" for both sign-up and sign-in
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Email sent successfully!");
+            toast.success("Email đã được gửi thành công!");
             router.push(`/verify-request?email=${email}`);
           },
           onError: (error: { error: { message: string } }) => {
@@ -92,9 +92,9 @@ export const RegistrationSection = () => {
         >
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Start Learning Today</CardTitle>
+              <CardTitle className="text-2xl">Bắt đầu Học ngay Hôm nay</CardTitle>
               <CardDescription>
-                Sign up for a free account to access thousands of high-quality courses
+                Đăng ký tài khoản miễn phí để truy cập hàng nghìn khóa học chất lượng cao
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -127,7 +127,7 @@ export const RegistrationSection = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  We&apos;ll send an OTP code to your email
+                  Chúng tôi sẽ gửi mã OTP đến email của bạn
                 </p>
               </div>
 
@@ -137,7 +137,7 @@ export const RegistrationSection = () => {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background px-2 text-muted-foreground">
-                    Or sign in with
+                    Hoặc đăng nhập bằng
                   </span>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export const RegistrationSection = () => {
                     />
                   </svg>
                 )}
-                Sign up with Google
+                Đăng ký với Google
               </Button>
 
               <Button
@@ -192,16 +192,16 @@ export const RegistrationSection = () => {
                 ) : (
                   <GithubIcon className="mr-2 h-4 w-4" />
                 )}
-                Sign up with GitHub
+                Đăng ký với GitHub
               </Button>
 
               <div className="text-center text-sm text-muted-foreground">
-                Already have an account?{" "}
+                Đã có tài khoản?{" "}
                 <Link
                   href="/login"
                   className="text-primary hover:underline font-medium"
                 >
-                  Sign in now
+                  Đăng nhập ngay
                 </Link>
               </div>
             </CardContent>

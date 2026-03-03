@@ -7,26 +7,26 @@ const stats = [
   {
     icon: BookOpen,
     value: "1000+",
-    label: "Courses Available",
-    description: "Comprehensive curriculum across multiple domains",
+    label: "Khóa học Có sẵn",
+    description: "Chương trình giảng dạy toàn diện trên nhiều lĩnh vực",
   },
   {
     icon: Users,
     value: "50K+",
-    label: "Active Students",
-    description: "Join our growing community of learners",
+    label: "Học viên Đang hoạt động",
+    description: "Tham gia cộng đồng người học đang phát triển của chúng tôi",
   },
   {
     icon: Award,
     value: "95%",
-    label: "Completion Rate",
-    description: "Students successfully complete their courses",
+    label: "Tỷ lệ Hoàn thành",
+    description: "Học viên hoàn thành thành công các khóa học của họ",
   },
   {
     icon: TrendingUp,
     value: "200+",
-    label: "Expert Instructors",
-    description: "Learn from industry professionals",
+    label: "Giảng viên Chuyên gia",
+    description: "Học từ các chuyên gia trong ngành",
   },
 ];
 
@@ -42,10 +42,10 @@ export const StatsSection = () => {
           className="text-center space-y-4 mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Our Impact in Numbers
+            Tác động của Chúng tôi qua Con số
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See how we're making a difference in online education
+            Xem cách chúng tôi tạo ra sự khác biệt trong giáo dục trực tuyến
           </p>
         </motion.div>
 

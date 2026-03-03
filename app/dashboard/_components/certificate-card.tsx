@@ -21,7 +21,7 @@ export default function CertificateCard({ certificate }: CertificateCardProps) {
     <Card className="group relative py-0 gap-0 hover:shadow-lg transition-shadow">
       <Badge className="absolute top-2 right-2 z-[10] bg-gradient-to-r from-yellow-500 to-orange-500">
         <Award className="size-3 mr-1" />
-        Certificate
+        Chứng chỉ
       </Badge>
       <Image
         src={thumbnailUrl}

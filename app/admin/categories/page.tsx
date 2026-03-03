@@ -11,13 +11,13 @@ const CategoriesPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
+          <h1 className="text-3xl font-bold">Danh mục</h1>
           <p className="text-muted-foreground mt-1">
-            Manage and organize all your categories
+            Quản lý và sắp xếp tất cả danh mục của bạn
           </p>
         </div>
         <Link href="/admin/categories/create" className={buttonVariants()}>
-          Create Category
+          Tạo Danh mục
         </Link>
       </div>
 
@@ -37,9 +37,9 @@ async function RenderCategories() {
         <CategoriesTable categories={data} />
       ) : (
         <EmptyState
-          title="No categories found"
-          description="Create a new category to get started"
-          buttonText="Create Category"
+          title="Chưa có danh mục nào"
+          description="Tạo danh mục mới để bắt đầu"
+          buttonText="Tạo Danh mục"
           href="/admin/categories/create"
         />
       )}

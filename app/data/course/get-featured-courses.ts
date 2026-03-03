@@ -25,6 +25,9 @@ export const getFeaturedCourses = async (limit: number = 5) => {
           slug: true,
         },
       },
+      _count: {
+        select: { enrollments: true },
+      },
     },
   });
 

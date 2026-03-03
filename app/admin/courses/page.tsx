@@ -11,13 +11,13 @@ const CoursesPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Your Courses</h1>
+          <h1 className="text-3xl font-bold">Khóa học của Bạn</h1>
           <p className="text-muted-foreground mt-1">
-            Manage and organize all your courses
+            Quản lý và sắp xếp tất cả khóa học của bạn
           </p>
         </div>
         <Link href="/admin/courses/create" className={buttonVariants()}>
-          Create Course
+          Tạo Khóa học
         </Link>
       </div>
 
@@ -37,9 +37,9 @@ async function RenderCourses() {
         <CoursesTable courses={data} />
       ) : (
         <EmptyState
-          title="No courses found"
-          description="Create a new course to get started"
-          buttonText="Create Course"
+          title="Chưa có khóa học nào"
+          description="Tạo khóa học mới để bắt đầu"
+          buttonText="Tạo Khóa học"
           href="/admin/courses/create"
         />
       )}

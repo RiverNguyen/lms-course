@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { Award } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Certificates",
-  description: "View your course completion certificates",
+  title: "Chứng chỉ",
+  description: "Xem chứng chỉ hoàn thành khóa học của bạn",
   robots: {
     index: false,
     follow: false,

@@ -5,7 +5,7 @@ import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
 import { request } from "@arcjet/next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -28,12 +28,12 @@ export const DeleteCategory = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -55,11 +55,19 @@ export const DeleteCategory = async (
     if (!category) {
       return {
         status: "error",
-        message: "Category not found",
+        message: "Không tìm thấy danh mục",
       };
     }
 
-    // Delete the category (courses will have categoryId set to null due to onDelete: SetNull)
+    // Check if category has courses
+    if (category._count.courses > 0) {
+      return {
+        status: "error",
+        message: `Không thể xóa danh mục này vì có ${category._count.courses} khóa học. Vui lòng xóa hết các khóa học trong danh mục trước khi xóa danh mục.`,
+      };
+    }
+
+    // Delete the category
     await prisma.category.delete({
       where: {
         id: categoryId,
@@ -67,15 +75,16 @@ export const DeleteCategory = async (
     });
 
     revalidatePath(`/admin/categories`);
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Category deleted successfully",
+      message: "Danh mục đã được xóa thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

@@ -43,22 +43,22 @@ export default function DeleteCourseRoute() {
     <div className="max-w-xl mx-auto w-full">
       <Card className="mt-32">
         <CardHeader>
-          <CardTitle>Are you sure you want to delete this course?</CardTitle>
-          <CardDescription>This action cannot be undone.</CardDescription>
+          <CardTitle>Bạn có chắc chắn muốn xóa khóa học này?</CardTitle>
+          <CardDescription>Hành động này không thể hoàn tác.</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-between">
           <Link
             className={buttonVariants({ variant: "outline" })}
             href={"/admin/courses"}
           >
-            Cancel
+            Hủy
           </Link>
 
           <Button variant="destructive" onClick={onSubmit} disabled={isPending}>
             {isPending ? (
               <Loader2Icon className="size-4 animate-spin" />
             ) : (
-              "Delete Course"
+              "Xóa Khóa học"
             )}
           </Button>
         </CardContent>

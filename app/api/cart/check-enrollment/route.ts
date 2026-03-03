@@ -22,11 +22,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ enrolled: {} }, { status: 200 });
     }
 
+    // Active = đang học, Completed = đã học xong — cả hai đều coi là đã sở hữu khóa học
     const enrollments = await prisma.enrollment.findMany({
       where: {
         userId: session.user.id,
         courseId: { in: courseIds },
-        status: "Active",
+        status: { in: ["Active", "Completed"] },
       },
       select: {
         courseId: true,

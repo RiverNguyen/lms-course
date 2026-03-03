@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -35,7 +34,7 @@ type TimeRange = "7d" | "30d" | "90d" | "1y"
 
 const chartConfig = {
   revenue: {
-    label: "Revenue",
+    label: "Doanh thu",
     color: "hsl(280 67% 51%)",
   },
 } satisfies ChartConfig
@@ -45,15 +44,8 @@ type ChartRevenueProps = {
 }
 
 export function ChartRevenue({ initialData }: ChartRevenueProps) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState<TimeRange>("90d")
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("7d")
   const [data, setData] = React.useState(initialData)
-
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("7d")
-    }
-  }, [isMobile])
 
   // Note: For dynamic time range updates, you would need to implement API routes
   // For now, we'll filter the initial data based on timeRange
@@ -86,12 +78,12 @@ export function ChartRevenue({ initialData }: ChartRevenueProps) {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Revenue</CardTitle>
+        <CardTitle>Doanh thu</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Revenue from course enrollments over time
+            Doanh thu từ ghi danh khóa học theo thời gian
           </span>
-          <span className="@[540px]/card:hidden">Revenue over time</span>
+          <span className="@[540px]/card:hidden">Doanh thu theo thời gian</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -101,31 +93,31 @@ export function ChartRevenue({ initialData }: ChartRevenueProps) {
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
           >
-            <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
-            <ToggleGroupItem value="30d">30 days</ToggleGroupItem>
-            <ToggleGroupItem value="90d">90 days</ToggleGroupItem>
-            <ToggleGroupItem value="1y">1 year</ToggleGroupItem>
+            <ToggleGroupItem value="7d">7 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="30d">30 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="90d">90 ngày</ToggleGroupItem>
+            <ToggleGroupItem value="1y">1 năm</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select time range"
+              aria-label="Chọn khoảng thời gian"
             >
-              <SelectValue placeholder="90 days" />
+              <SelectValue placeholder="7 ngày" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="7d" className="rounded-lg">
-                7 days
+                7 ngày
               </SelectItem>
               <SelectItem value="30d" className="rounded-lg">
-                30 days
+                30 ngày
               </SelectItem>
               <SelectItem value="90d" className="rounded-lg">
-                90 days
+                90 ngày
               </SelectItem>
               <SelectItem value="1y" className="rounded-lg">
-                1 year
+                1 năm
               </SelectItem>
             </SelectContent>
           </Select>
@@ -133,9 +125,9 @@ export function ChartRevenue({ initialData }: ChartRevenueProps) {
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="mb-4 text-2xl font-bold">
-              {new Intl.NumberFormat("en-US", {
+              {new Intl.NumberFormat("vi-VN", {
                 style: "currency",
-                currency: "USD",
+                currency: "VND",
               }).format(totalRevenue)}
             </div>
             <ChartContainer
@@ -177,16 +169,16 @@ export function ChartRevenue({ initialData }: ChartRevenueProps) {
                   content={
                     <ChartTooltipContent
                       labelFormatter={(value) => {
-                        return new Date(value).toLocaleDateString("en-US", {
+                        return new Date(value).toLocaleDateString("vi-VN", {
                           month: "long",
                           day: "numeric",
                           year: "numeric",
                         })
                       }}
                       formatter={(value) => {
-                        return new Intl.NumberFormat("en-US", {
+                        return new Intl.NumberFormat("vi-VN", {
                           style: "currency",
-                          currency: "USD",
+                          currency: "VND",
                         }).format(Number(value))
                       }}
                       indicator="dot"

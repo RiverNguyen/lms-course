@@ -16,8 +16,8 @@ export const FeaturedCoursesSection = () => {
     <section id="courses" className="py-20">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <SectionHeader
-          title="Featured Courses"
-          description="Discover the most popular courses, designed by leading experts in their fields"
+          title="Khóa học Nổi bật"
+          description="Khám phá các khóa học phổ biến nhất, được thiết kế bởi các chuyên gia hàng đầu trong lĩnh vực của họ"
         />
 
         <Suspense

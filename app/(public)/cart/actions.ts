@@ -1,6 +1,7 @@
 'use server'
 
 import { requireUser } from "@/app/data/user/require-user";
+import { validateCoupon } from "@/app/data/coupon/validate-coupon";
 import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
@@ -19,10 +20,39 @@ const aj = arcjet.withRule(
   })
 )
 
+export type AppliedCoupon = {
+  couponId: string;
+  discountAmount: number;
+  stripeCouponId: string;
+  code: string;
+};
+
+export const validateCouponAction = async (
+  code: string,
+  subtotal: number
+): Promise<
+  | { status: "success"; couponId: string; discountAmount: number; stripeCouponId: string; code: string; message: string }
+  | { status: "error"; message: string }
+> => {
+  const result = await validateCoupon(code, subtotal);
+  if (result.valid) {
+    return {
+      status: "success",
+      couponId: result.couponId,
+      discountAmount: result.discountAmount,
+      stripeCouponId: result.stripeCouponId,
+      code: code.trim().toUpperCase(),
+      message: result.message,
+    };
+  }
+  return { status: "error", message: result.message };
+};
+
 export const checkoutCartAction = async (
   items: CartItem[],
   subtotal: number,
-  total: number
+  total: number,
+  appliedCoupon?: AppliedCoupon | null
 ): Promise<ApiResponse | never> => {
   let checkoutUrl: string = '';
 
@@ -126,16 +156,34 @@ export const checkoutCartAction = async (
       }
     });
 
+    // Validate and apply coupon if provided
+    let finalTotal = total;
+    let discountAmount = 0;
+    let couponId: string | undefined;
+    let stripeCouponId: string | undefined;
+
+    if (appliedCoupon?.couponId && appliedCoupon.discountAmount > 0) {
+      const validation = await validateCoupon(appliedCoupon.code, subtotal);
+      if (validation.valid && validation.couponId === appliedCoupon.couponId) {
+        discountAmount = validation.discountAmount;
+        finalTotal = Math.max(0, subtotal - discountAmount);
+        couponId = appliedCoupon.couponId;
+        stripeCouponId = appliedCoupon.stripeCouponId;
+      }
+    }
+
     // Create order in database (Pending status)
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-    
+
     const order = await prisma.order.create({
       data: {
         orderNumber,
         subtotal: subtotal.toFixed(2),
-        total: total.toFixed(2),
+        total: finalTotal.toFixed(2),
+        discountAmount: discountAmount.toFixed(2),
         status: "Pending",
         userId: user.id,
+        couponId: couponId ?? null,
         orderItems: {
           create: items.map((item) => ({
             courseId: item.id,
@@ -148,11 +196,7 @@ export const checkoutCartAction = async (
       },
     });
 
-    // Apply discount to line items if needed
-    // Note: Stripe handles discounts via coupons or we can adjust line item prices
-    // For simplicity, we'll create the session with the original prices
-    // and the discount is already reflected in the order total
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: stripeCustomerId,
       line_items: lineItems,
       mode: 'payment',
@@ -164,7 +208,13 @@ export const checkoutCartAction = async (
         orderNumber: order.orderNumber,
         type: 'cart',
       },
-    })
+    };
+
+    if (stripeCouponId) {
+      sessionParams.discounts = [{ coupon: stripeCouponId }];
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
 
     checkoutUrl = checkoutSession.url as string;
   } catch (error) {

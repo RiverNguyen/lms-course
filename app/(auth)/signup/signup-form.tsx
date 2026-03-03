@@ -34,7 +34,7 @@ export const SignupForm = () => {
         fetchOptions: {
           onSuccess: () => {
             toast.success(
-              "Sign up with Github successfully, redirecting to homepage..."
+              "Đăng ký với Github thành công, đang chuyển hướng đến trang chủ..."
             );
             router.push("/");
           },
@@ -55,7 +55,7 @@ export const SignupForm = () => {
         fetchOptions: {
           onSuccess: () => {
             toast.success(
-              "Sign up with Google successfully, redirecting to homepage..."
+              "Đăng ký với Google thành công, đang chuyển hướng đến trang chủ..."
             );
             router.push("/");
           },
@@ -74,7 +74,7 @@ export const SignupForm = () => {
         type: "sign-in", // better-auth emailOTP uses "sign-in" for both sign-up and sign-in
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Email sent successfully");
+            toast.success("Email đã được gửi thành công");
             router.push(`/verify-request?email=${email}`);
           },
           onError: (error: { error: { message: string } }) => {
@@ -88,9 +88,9 @@ export const SignupForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Create an account</CardTitle>
+        <CardTitle className="text-xl">Tạo tài khoản</CardTitle>
         <CardDescription>
-          Sign up with your Google, Github, or Email Account
+          Đăng ký bằng tài khoản Google, Github hoặc Email của bạn
         </CardDescription>
       </CardHeader>
 
@@ -104,7 +104,7 @@ export const SignupForm = () => {
           {googlePending ? (
             <>
               <Loader2Icon className="size-4 animate-spin" />
-              <span>Signing up with Google...</span>
+              <span>Đang đăng ký với Google...</span>
             </>
           ) : (
             <>
@@ -131,7 +131,7 @@ export const SignupForm = () => {
                   fill="#EA4335"
                 />
               </svg>
-              Sign up with Google
+              Đăng ký với Google
             </>
           )}
         </Button>
@@ -145,19 +145,19 @@ export const SignupForm = () => {
           {githubPending ? (
             <>
               <Loader2Icon className="size-4 animate-spin" />
-              <span>Signing up with Github...</span>
+              <span>Đang đăng ký với Github...</span>
             </>
           ) : (
             <>
               <GithubIcon className="size-4" />
-              Sign up with Github
+              Đăng ký với Github
             </>
           )}
         </Button>
 
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:justify-center after:border-t after:border-border">
           <span className="relative z-10 bg-card px-2 text-muted-foreground">
-            Or continue with
+            Hoặc tiếp tục với
           </span>
         </div>
 
@@ -177,24 +177,24 @@ export const SignupForm = () => {
             {emailPending ? (
               <>
                 <Loader2Icon className="size-4 animate-spin" />
-                <span>Sending email...</span>
+                <span>Đang gửi email...</span>
               </>
             ) : (
               <>
                 <SendIcon className="size-4" />
-                <span>Continue with Email</span>
+                <span>Tiếp tục với Email</span>
               </>
             )}
           </Button>
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          Đã có tài khoản?{" "}
           <Link
             href="/login"
             className="text-primary hover:underline font-medium"
           >
-            Sign in
+            Đăng nhập
           </Link>
         </div>
       </CardContent>

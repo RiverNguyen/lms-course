@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 // Metadata for payment pages - can be overridden by individual pages
 export const metadata: Metadata = {
-  title: "Payment",
+  title: "Thanh toán",
   description: "Complete your course purchase and start learning today.",
   robots: {
     index: false,

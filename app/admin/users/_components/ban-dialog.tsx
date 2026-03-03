@@ -48,18 +48,18 @@ export function BanDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ban User</DialogTitle>
+          <DialogTitle>Khóa Người dùng</DialogTitle>
           <DialogDescription>
-            Are you sure you want to ban <strong>{userName}</strong>? Please
-            provide a reason for this action.
+            Bạn có chắc chắn muốn khóa <strong>{userName}</strong>? Vui lòng
+            cung cấp lý do cho hành động này.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="banReason">Ban Reason *</Label>
+            <Label htmlFor="banReason">Lý do khóa *</Label>
             <Textarea
               id="banReason"
-              placeholder="Enter the reason for banning this user..."
+              placeholder="Nhập lý do khóa người dùng này..."
               value={banReason}
               onChange={(e) => setBanReason(e.target.value)}
               rows={4}
@@ -67,7 +67,7 @@ export function BanDialog({
               className="resize-none"
             />
             <p className="text-xs text-muted-foreground">
-              This reason will be stored and may be visible to the user.
+              Lý do này sẽ được lưu và có thể hiển thị cho người dùng.
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export function BanDialog({
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
-            Cancel
+            Hủy
           </Button>
           <Button
             variant="destructive"
@@ -85,7 +85,7 @@ export function BanDialog({
             disabled={isPending || !banReason.trim()}
           >
             {isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-            Ban User
+            Khóa Người dùng
           </Button>
         </DialogFooter>
       </DialogContent>

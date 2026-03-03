@@ -23,12 +23,12 @@ export const AddToCartButton = ({
   courseFileKey,
 }: AddToCartButtonProps) => {
   const addItem = useCartStore((state) => state.addItem);
-  const { isEnrolled } = useCheckEnrollment(courseId);
+  const { isEnrolled, isLoading } = useCheckEnrollment(courseId);
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToCart = () => {
     if (isEnrolled) {
-      toast.info("You already own this course");
+      toast.info("Bạn đã sở hữu khóa học này");
       return;
     }
 
@@ -41,15 +41,15 @@ export const AddToCartButton = ({
         price: coursePrice,
         fileKey: courseFileKey,
       });
-      toast.success("Course added to cart!");
+      toast.success("Đã thêm khóa học vào giỏ hàng!");
     } catch (error) {
-      toast.error("An error occurred while adding to cart");
+      toast.error("Đã xảy ra lỗi khi thêm vào giỏ hàng");
     } finally {
       setIsAdding(false);
     }
   };
 
-  if (isEnrolled) {
+  if (isEnrolled || isLoading) {
     return null;
   }
 
@@ -61,7 +61,7 @@ export const AddToCartButton = ({
       disabled={isAdding}
     >
       <ShoppingCart className="h-4 w-4 mr-2" />
-      {isAdding ? "Adding..." : "Add to Cart"}
+      {isAdding ? "Đang thêm..." : "Thêm vào Giỏ hàng"}
     </Button>
   );
 };

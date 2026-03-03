@@ -9,11 +9,21 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import confetti from "canvas-confetti";
 import { useConfetti } from "@/hooks/use-confetti";
+import { useCartStore } from "@/store/cart-store";
 
 export default function PaymentSuccessContent() {
   const { triggerConfetti } = useConfetti();
   const searchParams = useSearchParams();
   const courseSlug = searchParams.get("course");
+  const orderId = searchParams.get("orderId");
+  const clearCart = useCartStore((s) => s.clearCart);
+
+  // Xóa giỏ hàng khi thanh toán giỏ hàng thành công (có orderId = checkout từ cart)
+  useEffect(() => {
+    if (orderId) {
+      clearCart();
+    }
+  }, [orderId, clearCart]);
 
   // Generate random positions once on mount using lazy initializer
   const [particlePositions] = useState(() =>
@@ -194,7 +204,7 @@ export default function PaymentSuccessContent() {
                 transition={{ delay: 0.5, duration: 0.5 }}
                 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent"
               >
-                Payment Successful!
+                Thanh toán Thành công!
               </motion.h2>
 
               <motion.p
@@ -203,7 +213,7 @@ export default function PaymentSuccessContent() {
                 transition={{ delay: 0.6, duration: 0.5 }}
                 className="text-sm text-muted-foreground mt-2 tracking-tight text-balance leading-relaxed"
               >
-                Thank you for your purchase! Your payment has been processed successfully. You can now access your course.
+                Cảm ơn bạn đã mua! Thanh toán của bạn đã được xử lý thành công. Bạn có thể truy cập khóa học ngay bây giờ.
               </motion.p>
 
               {/* Confetti-like particles effect */}
@@ -265,7 +275,7 @@ export default function PaymentSuccessContent() {
                       className="flex items-center justify-center gap-2"
                     >
                       <ArrowLeftIcon className="size-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                      Go to Home
+                      Về Trang chủ
                     </motion.div>
                   </Link>
                 </motion.div>
@@ -284,7 +294,7 @@ export default function PaymentSuccessContent() {
                       })}
                     >
                       <BookOpenIcon className="size-4 group-hover:scale-110 transition-transform duration-200" />
-                      View Course
+                      Xem Khóa học
                     </Link>
                   ) : (
                     <Link
@@ -295,7 +305,7 @@ export default function PaymentSuccessContent() {
                           "w-full shadow-sm hover:shadow-md transition-all duration-200 group border-green-500/30 hover:border-green-500/50",
                       })}
                     >
-                      Browse Courses
+                      Duyệt Khóa học
                     </Link>
                   )}
                 </motion.div>

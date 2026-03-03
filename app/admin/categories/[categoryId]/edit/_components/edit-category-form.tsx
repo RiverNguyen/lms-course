@@ -83,7 +83,7 @@ const EditCategoryForm = ({ data }: EditCategoryFormProps) => {
         >
           <ArrowLeftIcon className="size-4" />
         </Link>
-        <span className="text-sm text-muted-foreground">Back to categories</span>
+        <span className="text-sm text-muted-foreground">Quay lại danh mục</span>
       </div>
 
       <Form {...form}>
@@ -94,11 +94,11 @@ const EditCategoryForm = ({ data }: EditCategoryFormProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Tên</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
-                      placeholder="Enter the name of the category"
+                      placeholder="Nhập tên danh mục"
                       {...field}
                     />
                   </FormControl>
@@ -130,7 +130,7 @@ const EditCategoryForm = ({ data }: EditCategoryFormProps) => {
                 className="w-fit mt-5.5"
                 onClick={generateSlug}
               >
-                Generate Slug <SparklesIcon className="ml-1" size={16} />
+                Tạo Slug <SparklesIcon className="ml-1" size={16} />
               </Button>
             </div>
           </div>
@@ -140,10 +140,10 @@ const EditCategoryForm = ({ data }: EditCategoryFormProps) => {
             name="description"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Description (Optional)</FormLabel>
+                <FormLabel>Mô tả (Tùy chọn)</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Enter the description of the category"
+                    placeholder="Nhập mô tả của danh mục"
                     className="min-h-[120px]"
                     disabled={isPending}
                     {...field}
@@ -159,17 +159,17 @@ const EditCategoryForm = ({ data }: EditCategoryFormProps) => {
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Updating category...
+                  Đang cập nhật danh mục...
                 </>
               ) : (
-                "Update Category"
+                "Cập nhật Danh mục"
               )}
             </Button>
             <Link
               href="/admin/categories"
               className={buttonVariants({ variant: "outline" })}
             >
-              Cancel
+              Hủy
             </Link>
           </div>
         </form>

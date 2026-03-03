@@ -1,6 +1,9 @@
+"use client";
+
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { NotificationBell } from "@/components/notification-bell";
 
 export function SiteHeader() {
   return (
@@ -13,6 +16,7 @@ export function SiteHeader() {
         />
         <h1 className="text-base font-medium">TunaLMS.</h1>
         <div className="ml-auto flex items-center gap-2">
+          <NotificationBell variant="ghost" size="icon" />
           <AnimatedThemeToggler />
         </div>
       </div>

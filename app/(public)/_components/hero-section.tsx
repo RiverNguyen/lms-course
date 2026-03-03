@@ -31,7 +31,7 @@ export const HeroSection = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent"
             >
-              Discover Online Courses with Us
+              Khám phá Khóa học Trực tuyến cùng Chúng tôi
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -39,8 +39,8 @@ export const HeroSection = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground"
             >
-              A modern learning platform that helps you enhance your skills, expand your knowledge, and advance your career. 
-              Learn anytime, anywhere with high-quality courses from industry-leading experts.
+              Nền tảng học tập hiện đại giúp bạn nâng cao kỹ năng, mở rộng kiến thức và phát triển sự nghiệp. 
+              Học mọi lúc, mọi nơi với các khóa học chất lượng cao từ các chuyên gia hàng đầu.
             </motion.p>
           </motion.div>
 
@@ -58,7 +58,7 @@ export const HeroSection = () => {
                 href="/courses"
                 className={buttonVariants({ size: "lg", className: "group" })}
               >
-                Explore Courses
+                Khám phá Khóa học
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -75,7 +75,7 @@ export const HeroSection = () => {
                 })}
               >
                 <Play className="mr-2 h-4 w-4" />
-                Learn More
+                Tìm hiểu thêm
               </Link>
             </motion.div>
           </motion.div>
@@ -88,9 +88,9 @@ export const HeroSection = () => {
             className="grid grid-cols-3 gap-8 mt-12 w-full max-w-2xl"
           >
             {[
-              { value: "1000+", label: "Courses" },
-              { value: "50K+", label: "Students" },
-              { value: "200+", label: "Instructors" },
+              { value: "1000+", label: "Khóa học" },
+              { value: "50K+", label: "Học viên" },
+              { value: "200+", label: "Giảng viên" },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}

@@ -20,15 +20,15 @@ import { adminGetCourseLevelData } from "@/app/data/admin/admin-get-chart-data"
 
 const chartConfig = {
   Beginner: {
-    label: "Beginner",
+    label: "Cơ bản",
     color: "hsl(221 83% 53%)",
   },
   Intermediate: {
-    label: "Intermediate",
+    label: "Trung bình",
     color: "hsl(142 76% 36%)",
   },
   Advanced: {
-    label: "Advanced",
+    label: "Nâng cao",
     color: "hsl(38 92% 50%)",
   },
 } satisfies ChartConfig
@@ -49,9 +49,9 @@ export function ChartCourseLevel({ data }: ChartCourseLevelProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Course Level Distribution</CardTitle>
+        <CardTitle>Phân bố cấp độ khóa học</CardTitle>
         <CardDescription>
-          Total courses: {total}
+          Tổng số khóa học: {total}
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -3,15 +3,22 @@
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { useVideoCache } from "@/hooks/use-video-cache";
 import { BookIcon, Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+
+export interface VideoPlayerHandle {
+  getCurrentTime: () => number;
+  seek: (seconds: number) => void;
+}
 
 interface VideoPlayerProps {
   thumbnailKey: string;
   videoKey: string;
   onVideoEnd?: () => void;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
-export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerProps) => {
+export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
+  function VideoPlayer({ thumbnailKey, videoKey, onVideoEnd, onTimeUpdate }, ref) {
   const originalVideoUrl = useConstructUrl(videoKey);
   const thumbnailUrl = useConstructUrl(thumbnailKey);
   const { videoUrl, isLoading: isCacheLoading, isCached } = useVideoCache(videoKey, originalVideoUrl);
@@ -34,6 +41,20 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverPosition, setHoverPosition] = useState(0);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getCurrentTime: () => videoRef.current?.currentTime ?? 0,
+      seek: (seconds: number) => {
+        if (videoRef.current) {
+          videoRef.current.currentTime = Math.max(0, seconds);
+          setCurrentTime(videoRef.current.currentTime);
+        }
+      },
+    }),
+    []
+  );
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -154,7 +175,11 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
     const video = videoRef.current;
     if (!video) return;
 
-    const updateTime = () => setCurrentTime(video.currentTime);
+    const updateTime = () => {
+      const t = video.currentTime;
+      setCurrentTime(t);
+      onTimeUpdate?.(t);
+    };
     const updateDuration = () => setDuration(video.duration);
     const handlePlay = () => {
       setIsPlaying(true);
@@ -254,20 +279,20 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
           onError={(e) => {
             const video = e.currentTarget;
             const error = video.error;
-            let errorMsg = "Failed to load video.";
+            let errorMsg = "Không thể tải video.";
             if (error) {
               switch (error.code) {
                 case error.MEDIA_ERR_ABORTED:
-                  errorMsg = "Video loading aborted.";
+                  errorMsg = "Tải video bị hủy.";
                   break;
                 case error.MEDIA_ERR_NETWORK:
-                  errorMsg = "Network error while loading video.";
+                  errorMsg = "Lỗi mạng khi tải video.";
                   break;
                 case error.MEDIA_ERR_DECODE:
-                  errorMsg = "Video decoding error.";
+                  errorMsg = "Lỗi giải mã video.";
                   break;
                 case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                  errorMsg = "Video format not supported or URL invalid.";
+                  errorMsg = "Định dạng video không được hỗ trợ hoặc URL không hợp lệ.";
                   break;
               }
             }
@@ -278,7 +303,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
           <source src={videoUrl} type="video/mp4" />
           <source src={videoUrl} type="video/webm" />
           <source src={videoUrl} type="video/ogg" />
-          Your browser does not support the video tag.
+          Trình duyệt của bạn không hỗ trợ thẻ video.
         </video>
       )}
 
@@ -288,7 +313,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
             {isCached && (
-              <p className="text-white text-sm">Loading from cache...</p>
+              <p className="text-white text-sm">Đang tải từ bộ nhớ đệm...</p>
             )}
           </div>
         </div>
@@ -337,7 +362,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
             <button
               onClick={togglePlay}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-              aria-label={isPlaying ? "Pause" : "Play"}
+              aria-label={isPlaying ? "Tạm dừng" : "Phát"}
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5 text-white" />
@@ -356,7 +381,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
               <button
                 onClick={toggleMute}
                 className="p-2 hover:bg-white/20 rounded-full transition-colors"
-                aria-label={isMuted ? "Unmute" : "Mute"}
+                aria-label={isMuted ? "Bật tiếng" : "Tắt tiếng"}
               >
                 {isMuted ? (
                   <VolumeX className="w-5 h-5 text-white" />
@@ -380,7 +405,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
             <button
               onClick={toggleFullscreen}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              aria-label={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
             >
               {isFullscreen ? (
                 <Minimize className="w-5 h-5 text-white" />
@@ -396,7 +421,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
       {error && (
         <div className="absolute inset-0 flex items-center justify-center z-30 bg-black/80">
           <div className="text-center p-4">
-            <p className="text-white mb-2">Error loading video</p>
+            <p className="text-white mb-2">Lỗi tải video</p>
             <p className="text-sm text-gray-400 mb-4">{error}</p>
             <button
               onClick={() => {
@@ -406,7 +431,7 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
               }}
               className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
             >
-              Retry
+              Thử lại
             </button>
           </div>
         </div>
@@ -439,4 +464,4 @@ export const VideoPlayer = ({ thumbnailKey, videoKey, onVideoEnd }: VideoPlayerP
       )}
     </div>
   );
-};
+});

@@ -20,7 +20,7 @@ import { adminGetCoursesByCategoryData } from "@/app/data/admin/admin-get-chart-
 
 const chartConfig = {
   category: {
-    label: "Category",
+    label: "Danh mục",
     color: "hsl(221 83% 53%)",
   },
 } satisfies ChartConfig
@@ -40,9 +40,9 @@ export function ChartCoursesByCategory({ data }: ChartCoursesByCategoryProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Courses by Category</CardTitle>
+        <CardTitle>Khóa học theo danh mục</CardTitle>
         <CardDescription>
-          Total courses: {total}
+          Tổng số khóa học: {total}
         </CardDescription>
       </CardHeader>
       <CardContent>

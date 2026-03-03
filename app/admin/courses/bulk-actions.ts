@@ -5,7 +5,7 @@ import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
 import { request } from "@arcjet/next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -28,12 +28,12 @@ export const BulkDeleteCourses = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -41,7 +41,7 @@ export const BulkDeleteCourses = async (
     if (!courseIds || courseIds.length === 0) {
       return {
         status: "error",
-        message: "No courses selected",
+        message: "Chưa chọn khóa học nào",
       };
     }
 
@@ -57,12 +57,12 @@ export const BulkDeleteCourses = async (
 
     return {
       status: "success",
-      message: `${courseIds.length} course(s) deleted successfully`,
+      message: `${courseIds.length} khóa học đã được xóa thành công`,
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -81,12 +81,12 @@ export const BulkUpdateCourseStatus = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -94,7 +94,7 @@ export const BulkUpdateCourseStatus = async (
     if (!courseIds || courseIds.length === 0) {
       return {
         status: "error",
-        message: "No courses selected",
+        message: "Chưa chọn khóa học nào",
       };
     }
 
@@ -110,15 +110,17 @@ export const BulkUpdateCourseStatus = async (
     });
 
     revalidatePath(`/admin/courses`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: `${courseIds.length} course(s) updated successfully`,
+      message: `${courseIds.length} khóa học đã được cập nhật thành công`,
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

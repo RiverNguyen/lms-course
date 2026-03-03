@@ -2,16 +2,17 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getFilteredCourses } from "@/app/data/course/get-filtered-courses";
 import { getCourseFilters } from "@/app/data/course/get-course-filters";
+import { getWishlistCourseIds } from "@/app/data/wishlist/get-wishlist-course-ids";
 import CoursesListClient from "./_components/courses-list-client";
 import { PublicCourseCardSkeleton } from "@/app/(public)/_components/public-course-card";
 
 export const metadata: Metadata = {
-  title: "All Courses",
-  description: "Discover a wide range of courses on a variety of topics. Browse our comprehensive course catalog and find the perfect learning path for your career.",
-  keywords: ["courses", "online courses", "learning", "education", "skill development", "professional development"],
+  title: "Tất cả Khóa học",
+  description: "Khám phá nhiều khóa học đa dạng về nhiều chủ đề. Duyệt danh mục khóa học toàn diện của chúng tôi và tìm lộ trình học tập hoàn hảo cho sự nghiệp của bạn.",
+  keywords: ["khóa học", "khóa học trực tuyến", "học tập", "giáo dục", "phát triển kỹ năng", "phát triển chuyên nghiệp"],
   openGraph: {
-    title: "All Courses - TunaLMS",
-    description: "Discover a wide range of courses on a variety of topics. Browse our comprehensive course catalog.",
+    title: "Tất cả Khóa học - TunaLMS",
+    description: "Khám phá nhiều khóa học đa dạng về nhiều chủ đề. Duyệt danh mục khóa học toàn diện của chúng tôi.",
     url: "/courses",
   },
   alternates: {
@@ -36,7 +37,7 @@ const CoursesPage = async ({ searchParams }: CoursesPageProps) => {
     <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
       <div className="flex flex-col space-y-2 mb-6 mt-4">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">
-          All Courses
+          Tất cả Khóa học
         </h1>
       </div>
       <Suspense
@@ -76,7 +77,7 @@ async function RenderCourses({
   const price = (params.price as "all" | "free" | "paid") || "all";
   const page = parseInt(params.page || "1", 10);
 
-  const [coursesData, filters] = await Promise.all([
+  const [coursesData, filters, wishlistCourseIds] = await Promise.all([
     getFilteredCourses({
       search: params.search,
       categories,
@@ -86,6 +87,7 @@ async function RenderCourses({
       pageSize: 6,
     }),
     getCourseFilters(),
+    getWishlistCourseIds(),
   ]);
 
   return (
@@ -94,6 +96,7 @@ async function RenderCourses({
       filters={filters}
       totalPages={coursesData.totalPages}
       currentPage={coursesData.page}
+      wishlistCourseIds={wishlistCourseIds}
     />
   );
 }
