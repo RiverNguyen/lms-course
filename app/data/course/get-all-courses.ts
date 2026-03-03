@@ -24,6 +24,9 @@ export const getAllCourses = async () => {
           slug: true,
         },
       },
+      _count: {
+        select: { enrollments: true },
+      },
     },
   });
 

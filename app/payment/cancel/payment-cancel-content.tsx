@@ -108,7 +108,7 @@ export default function PaymentCancelPageContent() {
                 transition={{ delay: 0.5, duration: 0.5 }}
                 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent"
               >
-                Payment Cancelled
+                Thanh toán Đã hủy
               </motion.h2>
 
               <motion.p
@@ -117,7 +117,7 @@ export default function PaymentCancelPageContent() {
                 transition={{ delay: 0.6, duration: 0.5 }}
                 className="text-sm text-muted-foreground mt-2 tracking-tight text-balance leading-relaxed"
               >
-                No worries! You can try again later. Your payment was not processed.
+                Đừng lo! Bạn có thể thử lại sau. Thanh toán của bạn chưa được xử lý.
               </motion.p>
 
               {/* Button with animations */}
@@ -149,7 +149,7 @@ export default function PaymentCancelPageContent() {
                       className="flex items-center justify-center gap-2"
                     >
                       <ArrowLeftIcon className="size-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                      Go to Home
+                      Về Trang chủ
                     </motion.div>
                   </Link>
                 </motion.div>

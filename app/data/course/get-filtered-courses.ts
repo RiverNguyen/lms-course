@@ -1,6 +1,7 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
-interface FilterParams {
+export interface FilterParams {
   search?: string;
   categories?: string[];
   levels?: string[];
@@ -9,7 +10,7 @@ interface FilterParams {
   pageSize?: number;
 }
 
-export const getFilteredCourses = async (params: FilterParams = {}) => {
+const getFilteredCoursesUncached = async (params: FilterParams = {}) => {
   const {
     search = "",
     categories = [],
@@ -36,9 +37,9 @@ export const getFilteredCourses = async (params: FilterParams = {}) => {
     ];
   }
 
-  // Category filter
+  // Category filter (by slug)
   if (categories.length > 0) {
-    where.categoryId = { in: categories };
+    where.category = { slug: { in: categories } };
   }
 
   // Level filter
@@ -112,6 +113,26 @@ export const getFilteredCourses = async (params: FilterParams = {}) => {
     totalPages: Math.ceil(total / pageSize),
   };
 };
+
+/** Cache theo bộ filter, revalidate 60s, tag để revalidate khi đổi course */
+function filteredCoursesCacheKey(params: FilterParams) {
+  const search = params.search ?? "";
+  const categories = (params.categories ?? []).slice().sort().join(",");
+  const levels = (params.levels ?? []).join(",");
+  const price = params.price ?? "all";
+  const page = params.page ?? 1;
+  const pageSize = params.pageSize ?? 6;
+  return ["filtered-courses", search, categories, levels, price, String(page), String(pageSize)];
+}
+
+export const getFilteredCourses = (
+  params: FilterParams = {}
+): Promise<Awaited<ReturnType<typeof getFilteredCoursesUncached>>> =>
+  unstable_cache(
+    () => getFilteredCoursesUncached(params),
+    filteredCoursesCacheKey(params),
+    { revalidate: 60, tags: ["courses"] }
+  )();
 
 export type FilteredCourseType = Awaited<
   ReturnType<typeof getFilteredCourses>

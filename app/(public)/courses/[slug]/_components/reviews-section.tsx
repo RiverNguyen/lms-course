@@ -169,7 +169,7 @@ export const ReviewsSection = ({
     <div className="mt-12 space-y-6">
       <div className="space-y-4">
         <h2 className="text-3xl font-semibold tracking-tight">
-          Reviews & Ratings
+          Đánh giá & Xếp hạng
         </h2>
 
         {/* Rating Summary */}
@@ -180,8 +180,7 @@ export const ReviewsSection = ({
                 <div className="text-5xl font-bold">{reviewsData.averageRating.toFixed(1)}</div>
                 <StarRating rating={Math.round(reviewsData.averageRating)} />
                 <p className="text-sm text-muted-foreground mt-2">
-                  {reviewsData.totalReviews} review
-                  {reviewsData.totalReviews !== 1 ? "s" : ""}
+                  {reviewsData.totalReviews} đánh giá
                 </p>
               </div>
               <div className="flex-1 space-y-2">
@@ -225,7 +224,7 @@ export const ReviewsSection = ({
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">
-                  Rating *
+                  Xếp hạng *
                 </label>
                 <StarRating
                   rating={rating}
@@ -235,12 +234,12 @@ export const ReviewsSection = ({
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">
-                  Comment
+                  Bình luận
                 </label>
                 <Textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Share your thoughts about this course..."
+                  placeholder="Chia sẻ suy nghĩ của bạn về khóa học này..."
                   rows={4}
                 />
               </div>
@@ -252,12 +251,12 @@ export const ReviewsSection = ({
                   {isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {userReview ? "Updating..." : "Submitting..."}
+                      {userReview ? "Đang cập nhật..." : "Đang gửi..."}
                     </>
                   ) : userReview ? (
-                    "Update Review"
+                    "Cập nhật Đánh giá"
                   ) : (
-                    "Submit Review"
+                    "Gửi Đánh giá"
                   )}
                 </Button>
                 {userReview && (
@@ -291,7 +290,7 @@ export const ReviewsSection = ({
           {reviews.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-muted-foreground">
-                No reviews yet. Be the first to review this course!
+                Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá khóa học này!
               </CardContent>
             </Card>
           ) : (

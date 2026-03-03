@@ -4,21 +4,21 @@ import { WhyChooseSection } from "./_components/why-choose-section";
 import { TeamSection } from "./_components/team-section";
 
 export const metadata: Metadata = {
-  title: "About Us - TunaLMS | Learn More About Our Platform",
+  title: "Giới thiệu - TunaLMS | Tìm hiểu về Nền tảng của Chúng tôi",
   description:
-    "Discover TunaLMS - a leading online learning platform. Learn about our mission, vision, team, and why thousands of students choose us for their education journey.",
+    "Khám phá TunaLMS - nền tảng học tập trực tuyến hàng đầu. Tìm hiểu về sứ mệnh, tầm nhìn, đội ngũ của chúng tôi và lý do hàng nghìn học viên chọn chúng tôi cho hành trình giáo dục của họ.",
   keywords: [
-    "about TunaLMS",
-    "LMS platform",
-    "online education",
-    "learning management system",
-    "education technology",
-    "online learning platform",
+    "giới thiệu TunaLMS",
+    "nền tảng LMS",
+    "giáo dục trực tuyến",
+    "hệ thống quản lý học tập",
+    "công nghệ giáo dục",
+    "nền tảng học trực tuyến",
   ],
   openGraph: {
-    title: "About TunaLMS - Leading Online Learning Platform",
+    title: "Giới thiệu TunaLMS - Nền tảng Học tập Trực tuyến Hàng đầu",
     description:
-      "Discover TunaLMS - a leading online learning platform. Learn about our mission, vision, and team.",
+      "Khám phá TunaLMS - nền tảng học tập trực tuyến hàng đầu. Tìm hiểu về sứ mệnh, tầm nhìn và đội ngũ của chúng tôi.",
     url: "/about",
   },
   alternates: {

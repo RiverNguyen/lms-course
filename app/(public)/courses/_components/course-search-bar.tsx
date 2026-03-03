@@ -29,7 +29,13 @@ const CourseSearchBar = ({
       } else {
         params.delete("search");
       }
-      router.push(`${pathname}?${params.toString()}`);
+      const newQuery = params.toString();
+      const currentQuery = searchParams.toString();
+      // Chỉ navigate khi URL thực sự đổi → danh sách khóa học bên dưới cập nhật theo search
+      if (newQuery !== currentQuery) {
+        router.push(newQuery ? `${pathname}?${newQuery}` : pathname);
+        router.refresh(); // Bắt server re-fetch courses theo search mới
+      }
     }, 300); // Debounce search
 
     return () => clearTimeout(timer);
@@ -41,7 +47,7 @@ const CourseSearchBar = ({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search courses..."
+          placeholder="Tìm kiếm khóa học..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-10"

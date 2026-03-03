@@ -7,27 +7,27 @@ import { motion } from "motion/react";
 const benefits = [
   {
     icon: Clock,
-    title: "Learn Anytime, Anywhere",
+    title: "Học Mọi lúc, Mọi nơi",
     description:
-      "Access courses whenever you want, from any device. Learn at your own pace without being limited by time or location.",
+      "Truy cập khóa học bất cứ khi nào bạn muốn, từ bất kỳ thiết bị nào. Học theo tốc độ của riêng bạn mà không bị giới hạn bởi thời gian hay địa điểm.",
   },
   {
     icon: Globe,
-    title: "Diverse Course Catalog",
+    title: "Danh mục Khóa học Đa dạng",
     description:
-      "Over 1000+ diverse courses across various fields, from information technology, business, design to personal development.",
+      "Hơn 1000+ khóa học đa dạng trên nhiều lĩnh vực, từ công nghệ thông tin, kinh doanh, thiết kế đến phát triển cá nhân.",
   },
   {
     icon: Award,
-    title: "Certificates Upon Completion",
+    title: "Chứng chỉ Sau khi Hoàn thành",
     description:
-      "Receive recognized certificates after completing courses, helping you enhance your profile and career opportunities.",
+      "Nhận chứng chỉ được công nhận sau khi hoàn thành khóa học, giúp bạn nâng cao hồ sơ và cơ hội nghề nghiệp.",
   },
   {
     icon: Users,
-    title: "Learning Community",
+    title: "Cộng đồng Học tập",
     description:
-      "Join a vibrant community of learners, exchange knowledge and connect with people who share your passion for learning.",
+      "Tham gia cộng đồng người học sôi động, trao đổi kiến thức và kết nối với những người cùng đam mê học tập.",
   },
 ];
 
@@ -43,11 +43,11 @@ export const LMSIntroSection = () => {
           className="text-center space-y-4 mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Why Choose TunaLMS?
+            Tại sao Chọn TunaLMS?
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            TunaLMS is a leading online learning platform designed to deliver the best learning experience. 
-            We are committed to providing high-quality content, cutting-edge technology, and dedicated support to help you achieve your learning goals.
+            TunaLMS là nền tảng học tập trực tuyến hàng đầu được thiết kế để mang lại trải nghiệm học tập tốt nhất. 
+            Chúng tôi cam kết cung cấp nội dung chất lượng cao, công nghệ tiên tiến và hỗ trợ tận tâm để giúp bạn đạt được mục tiêu học tập.
           </p>
         </motion.div>
 

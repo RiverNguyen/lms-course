@@ -49,7 +49,7 @@ export const LoginForm = () => {
               console.error("Error checking banned status:", error);
             }
             toast.success(
-              "Login with Google successfully, redirecting to homepage..."
+              "Đăng nhập với Google thành công, đang chuyển hướng đến trang chủ..."
             );
             router.push("/");
           },
@@ -85,7 +85,7 @@ export const LoginForm = () => {
               console.error("Error checking banned status:", error);
             }
             toast.success(
-              "Login with Github successfully, redirecting to homepage..."
+              "Đăng nhập với Github thành công, đang chuyển hướng đến trang chủ..."
             );
             router.push("/");
           },
@@ -104,7 +104,7 @@ export const LoginForm = () => {
         type: "sign-in",
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Email sent successfully");
+            toast.success("Email đã được gửi thành công");
             router.push(`/verify-request?email=${email}`);
           },
           onError: (error) => {
@@ -117,8 +117,8 @@ export const LoginForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Welcome back!</CardTitle>
-        <CardDescription>Login with your Google, Github, or Email Account</CardDescription>
+        <CardTitle className="text-xl">Chào mừng trở lại!</CardTitle>
+        <CardDescription>Đăng nhập bằng tài khoản Google, Github hoặc Email của bạn</CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4">
@@ -131,7 +131,7 @@ export const LoginForm = () => {
           {googlePending ? (
             <>
               <Loader2Icon className="size-4 animate-spin" />
-              <span>Signing in with Google...</span>
+              <span>Đang đăng nhập với Google...</span>
             </>
           ) : (
             <>
@@ -158,7 +158,7 @@ export const LoginForm = () => {
                   fill="#EA4335"
                 />
               </svg>
-              Sign in with Google
+              Đăng nhập với Google
             </>
           )}
         </Button>
@@ -172,19 +172,19 @@ export const LoginForm = () => {
           {githubPending ? (
             <>
               <Loader2Icon className="size-4 animate-spin" />
-              <span>Signing in with Github...</span>
+              <span>Đang đăng nhập với Github...</span>
             </>
           ) : (
             <>
               <GithubIcon className="size-4" />
-              Sign in with Github
+              Đăng nhập với Github
             </>
           )}
         </Button>
 
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:justify-center after:border-t after:border-border">
           <span className="relative z-10 bg-card px-2 text-muted-foreground">
-            Or continue with
+            Hoặc tiếp tục với
           </span>
         </div>
 
@@ -203,24 +203,24 @@ export const LoginForm = () => {
             {emailPending ? (
               <>
                 <Loader2Icon className="size-4 animate-spin" />
-                <span>Sending email...</span>
+                <span>Đang gửi email...</span>
               </>
             ) : (
               <>
                 <SendIcon className="size-4" />
-                <span>Continue with Email</span>
+                <span>Tiếp tục với Email</span>
               </>
             )}
           </Button>
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          Chưa có tài khoản?{" "}
           <Link
             href="/signup"
             className="text-primary hover:underline font-medium"
           >
-            Sign up
+            Đăng ký
           </Link>
         </div>
       </CardContent>

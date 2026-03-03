@@ -17,16 +17,16 @@ export function SignOutButton() {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {
-              toast.success("Signed out successfully");
+              toast.success("Đăng xuất thành công");
               router.push("/login");
             },
             onError: (error) => {
-              toast.error(error.error.message || "Failed to sign out");
+              toast.error(error.error.message || "Không thể đăng xuất");
             },
           },
         });
       } catch (error) {
-        toast.error("Failed to sign out");
+        toast.error("Không thể đăng xuất");
       }
     });
   };
@@ -41,12 +41,12 @@ export function SignOutButton() {
       {isPending ? (
         <>
           <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-          Signing out...
+          Đang đăng xuất...
         </>
       ) : (
         <>
           <LogOutIcon className="mr-2 h-4 w-4" />
-          Sign Out
+          Đăng xuất
         </>
       )}
     </Button>

@@ -128,14 +128,14 @@ const chartData = [
 
 const chartConfig = {
   visitors: {
-    label: "Visitors",
+    label: "Người truy cập",
   },
   desktop: {
-    label: "Desktop",
+    label: "Máy tính",
     color: "var(--primary)",
   },
   mobile: {
-    label: "Mobile",
+    label: "Điện thoại",
     color: "var(--primary)",
   },
 } satisfies ChartConfig
@@ -153,11 +153,11 @@ export function ChartAreaInteractive() {
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date)
     const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
+    let daysToSubtract = 7
     if (timeRange === "30d") {
       daysToSubtract = 30
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
+    } else if (timeRange === "90d") {
+      daysToSubtract = 90
     }
     const startDate = new Date(referenceDate)
     startDate.setDate(startDate.getDate() - daysToSubtract)
@@ -167,12 +167,12 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+        <CardTitle>Tổng người truy cập</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Total for the last 3 months
+            Tổng trong 3 tháng qua
           </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
+          <span className="@[540px]/card:hidden">3 tháng qua</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -190,19 +190,19 @@ export function ChartAreaInteractive() {
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select a value"
+              aria-label="Chọn khoảng thời gian"
             >
-              <SelectValue placeholder="Last 3 months" />
+              <SelectValue placeholder="7 ngày qua" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="90d" className="rounded-lg">
-                Last 3 months
+                3 tháng qua
               </SelectItem>
               <SelectItem value="30d" className="rounded-lg">
-                Last 30 days
+                30 ngày qua
               </SelectItem>
               <SelectItem value="7d" className="rounded-lg">
-                Last 7 days
+                7 ngày qua
               </SelectItem>
             </SelectContent>
           </Select>
@@ -249,7 +249,7 @@ export function ChartAreaInteractive() {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
+                return date.toLocaleDateString("vi-VN", {
                   month: "short",
                   day: "numeric",
                 })
@@ -260,7 +260,7 @@ export function ChartAreaInteractive() {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
+                    return new Date(value).toLocaleDateString("vi-VN", {
                       month: "short",
                       day: "numeric",
                     })

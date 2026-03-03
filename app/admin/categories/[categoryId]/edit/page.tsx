@@ -17,15 +17,15 @@ const EditCategoryPage = async ({ params }: { params: Params }) => {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">
-        Edit Category:{" "}
+        Chỉnh sửa Danh mục:{" "}
         <span className="text-primary underline">{data?.name}</span>
       </h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Category Information</CardTitle>
+          <CardTitle>Thông tin Danh mục</CardTitle>
           <CardDescription>
-            Update information about the category
+            Cập nhật thông tin về danh mục
           </CardDescription>
         </CardHeader>
         <CardContent>

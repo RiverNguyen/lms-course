@@ -19,13 +19,13 @@ export const RenderEmptyState = ({
         />
       </div>
       <p className="text-base font-semibold text-foreground">
-        Drop your files here or{" "}
+        Kéo thả tệp vào đây hoặc{" "}
         <span className="text-primary font-medium cursor-pointer">
-          click to upload
+          nhấp để tải lên
         </span>
       </p>
       <Button type="button" className="mt-4">
-        Select file
+        Chọn tệp
       </Button>
     </div>
   );
@@ -37,12 +37,12 @@ export const RenderErrorState = () => {
       <div className="flex items-center mx-auto justify-center size-12 rounded-full bg-destructive/30 mb-4">
         <ImageIcon className="size-6 text-destructive" />
       </div>
-      <p className="text-base font-semibold">Upload Failed</p>
+      <p className="text-base font-semibold">Tải lên thất bại</p>
       <p className="text-xs text-muted-foreground mt-1">
-        Something went wrong while uploading your files. Please try again.
+        Đã xảy ra lỗi khi tải lên tệp của bạn. Vui lòng thử lại.
       </p>
       <Button type="button" className="mt-4">
-        Retry File Selection
+        Chọn lại tệp
       </Button>
     </div>
   );
@@ -66,7 +66,7 @@ export const RenderSuccessState = ({
       ) : (
         <Image
           src={previewUrl}
-          alt="Uploaded file"
+          alt="Tệp đã tải lên"
           fill
           className="object-contain p-2"
         />

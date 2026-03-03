@@ -8,23 +8,23 @@ import { CTASection } from "@/app/(public)/_components/cta-section";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home - Online Learning Platform | TunaLMS",
+  title: "Trang chủ - Nền tảng Học tập Trực tuyến | TunaLMS",
   description:
-    "Discover the leading online learning platform with thousands of high-quality courses. Learn anytime, anywhere with TunaLMS - the most modern LMS platform.",
+    "Khám phá nền tảng học tập trực tuyến hàng đầu với hàng nghìn khóa học chất lượng cao. Học mọi lúc, mọi nơi với TunaLMS - nền tảng LMS hiện đại nhất.",
   keywords: [
-    "online courses",
-    "online learning",
-    "LMS platform",
+    "khóa học trực tuyến",
+    "học trực tuyến",
+    "nền tảng LMS",
     "e-learning",
-    "online education",
-    "online training",
-    "course platform",
-    "learn online",
+    "giáo dục trực tuyến",
+    "đào tạo trực tuyến",
+    "nền tảng khóa học",
+    "học online",
   ],
   openGraph: {
-    title: "TunaLMS - Leading Online Learning Platform",
+    title: "TunaLMS - Nền tảng Học tập Trực tuyến Hàng đầu",
     description:
-      "Discover the leading online learning platform with thousands of high-quality courses.",
+      "Khám phá nền tảng học tập trực tuyến hàng đầu với hàng nghìn khóa học chất lượng cao.",
     url: "/",
   },
   alternates: {

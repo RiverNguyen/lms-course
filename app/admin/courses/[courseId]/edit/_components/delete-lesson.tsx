@@ -60,19 +60,19 @@ const DeleteLesson = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want to delete this lesson?
+            Bạn có chắc chắn muốn xóa bài học này?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This lesson will be deleted permanently.
+            Bài học này sẽ bị xóa vĩnh viễn.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Hủy</AlertDialogCancel>
           <AlertDialogAction onClick={onDelete} disabled={isPending}>
             {isPending ? (
               <Loader2Icon className="size-4 animate-spin" />
             ) : (
-              "Delete"
+              "Xóa"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

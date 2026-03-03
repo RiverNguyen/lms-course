@@ -12,7 +12,9 @@ import {
   BarChart3,
   ArrowRight,
   ShoppingCart,
+  BookOpenIcon,
 } from "lucide-react";
+import { WishlistButton } from "@/app/(public)/_components/wishlist-button";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart-store";
@@ -22,12 +24,19 @@ import { useCheckEnrollment } from "@/hooks/use-check-enrollment";
 
 interface CourseListCardProps {
   data: FilteredCourseType;
+  initialInWishlist?: boolean;
 }
 
-const CourseListCard = ({ data }: CourseListCardProps) => {
+const levelLabels: Record<string, string> = {
+  Beginner: "Người mới bắt đầu",
+  Intermediate: "Trung cấp",
+  Advanced: "Nâng cao",
+};
+
+const CourseListCard = ({ data, initialInWishlist = false }: CourseListCardProps) => {
   const thumbnailUrl = useConstructUrl(data?.fileKey);
   const addItem = useCartStore((state) => state.addItem);
-  const { isEnrolled } = useCheckEnrollment(data.id);
+  const { isEnrolled, isLoading } = useCheckEnrollment(data.id);
   const lessonCount = data.chapters.reduce(
     (acc, chapter) => acc + chapter.lessons.length,
     0
@@ -40,12 +49,12 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
     e.stopPropagation();
     
     if (isFree) {
-      toast.info("Free courses don't need to be added to cart");
+      toast.info("Khóa học miễn phí không cần thêm vào giỏ hàng");
       return;
     }
 
     if (isEnrolled) {
-      toast.info("You already own this course");
+      toast.info("Bạn đã sở hữu khóa học này");
       return;
     }
 
@@ -56,7 +65,7 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
       price: data.price,
       fileKey: data.fileKey,
     });
-    toast.success("Course added to cart!");
+    toast.success("Đã thêm khóa học vào giỏ hàng!");
   };
 
   return (
@@ -65,8 +74,14 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
         {/* Course Image */}
         <div className="relative w-full md:w-64 lg:w-80 h-48 md:h-auto flex-shrink-0">
           <Badge className="absolute top-2 left-2 z-10">
-            {data?.category?.name || "Uncategorized"}
+            {data?.category?.name || "Chưa phân loại"}
           </Badge>
+          <WishlistButton
+            courseId={data.id}
+            initialInWishlist={initialInWishlist}
+            variant="icon-on-card"
+            className="absolute top-2 right-2 left-auto z-10"
+          />
           <Image
             src={thumbnailUrl}
             alt={data?.title}
@@ -80,7 +95,7 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
           <div>
             {/* Instructor */}
             <p className="text-sm text-muted-foreground mb-2">
-              by {data?.user?.name || "Unknown Instructor"}
+              bởi {data?.user?.name || "Giảng viên chưa xác định"}
             </p>
 
             {/* Course Title */}
@@ -99,15 +114,15 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
               </div>
               <div className="flex items-center gap-2">
                 <GraduationCap className="size-4" />
-                <span>{studentCount} Students</span>
+                <span>{studentCount} Học viên</span>
               </div>
               <div className="flex items-center gap-2">
                 <BarChart3 className="size-4" />
-                <span>{data?.level}</span>
+                <span>{levelLabels[data?.level] || data?.level}</span>
               </div>
               <div className="flex items-center gap-2">
                 <BookOpen className="size-4" />
-                <span>{lessonCount} Lessons</span>
+                <span>{lessonCount} Bài học</span>
               </div>
             </div>
           </div>
@@ -117,23 +132,36 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold">
                 {isFree ? (
-                  <span className="text-green-600">Free</span>
+                  <span className="text-green-600">Miễn phí</span>
                 ) : (
-                  `$${parseFloat(data.price).toFixed(1)}`
+                  new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(Number(data.price))
                 )}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              {!isFree && !isEnrolled && (
+              {isEnrolled ? (
+                <Link
+                  href={`/dashboard/${data?.slug}`}
+                  className={buttonVariants({
+                    className: "whitespace-nowrap",
+                  })}
+                >
+                  <BookOpenIcon className="size-4 mr-2" />
+                  Vào khóa học
+                </Link>
+              ) : !isFree && !isLoading ? (
                 <Button
                   variant="default"
                   onClick={handleAddToCart}
                   className="whitespace-nowrap"
                 >
                   <ShoppingCart className="size-4 mr-2" />
-                  Add to Cart
+                  Thêm vào giỏ
                 </Button>
-              )}
+              ) : null}
               <Link
                 href={`/courses/${data?.slug}`}
                 className={buttonVariants({
@@ -141,7 +169,7 @@ const CourseListCard = ({ data }: CourseListCardProps) => {
                   className: "group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200 whitespace-nowrap",
                 })}
               >
-                View More <ArrowRight className="size-4 ml-2" />
+                Xem thêm <ArrowRight className="size-4 ml-2" />
               </Link>
             </div>
           </div>

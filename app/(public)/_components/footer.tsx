@@ -10,7 +10,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-bold">TunaLMS</h3>
             <p className="text-sm text-muted-foreground">
-              A modern online learning platform that helps you enhance your skills and advance your career.
+              Nền tảng học trực tuyến hiện đại giúp bạn nâng cao kỹ năng và phát triển sự nghiệp.
             </p>
             <div className="flex space-x-4">
               <a
@@ -43,14 +43,14 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Quick Links</h4>
+            <h4 className="text-sm font-semibold">Liên kết nhanh</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/courses"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Courses
+                  Khóa học
                 </Link>
               </li>
               <li>
@@ -58,7 +58,7 @@ export const Footer = () => {
                   href="/dashboard"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Dashboard
+                  Bảng điều khiển
                 </Link>
               </li>
               <li>
@@ -66,7 +66,7 @@ export const Footer = () => {
                   href="/#about"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  About
+                  Giới thiệu
                 </Link>
               </li>
               <li>
@@ -74,7 +74,7 @@ export const Footer = () => {
                   href="/#contact"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Contact
+                  Liên hệ
                 </Link>
               </li>
             </ul>
@@ -82,14 +82,14 @@ export const Footer = () => {
 
           {/* Legal */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Legal</h4>
+            <h4 className="text-sm font-semibold">Pháp lý</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/privacy"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Privacy Policy
+                  Chính sách bảo mật
                 </Link>
               </li>
               <li>
@@ -97,7 +97,7 @@ export const Footer = () => {
                   href="/terms"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Terms of Service
+                  Điều khoản dịch vụ
                 </Link>
               </li>
               <li>
@@ -105,7 +105,7 @@ export const Footer = () => {
                   href="/refund"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Refund Policy
+                  Chính sách hoàn tiền
                 </Link>
               </li>
             </ul>
@@ -113,17 +113,17 @@ export const Footer = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Contact</h4>
+            <h4 className="text-sm font-semibold">Liên hệ</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>Email: contact@tunalms.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
-              <li>Hours: 8:00 AM - 10:00 PM</li>
+              <li>Điện thoại: +1 (555) 123-4567</li>
+              <li>Giờ làm việc: 8:00 - 22:00</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} TunaLMS. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} TunaLMS. Tất cả quyền được bảo lưu.</p>
         </div>
       </div>
     </footer>

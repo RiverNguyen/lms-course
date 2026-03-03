@@ -7,9 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { tryCatch } from "@/hooks/try-catch";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { DeleteCategory } from "@/app/admin/categories/[categoryId]/delete/action";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
@@ -18,6 +27,8 @@ import { Loader2Icon } from "lucide-react";
 
 export default function DeleteCategoryRoute() {
   const [isPending, startTransition] = useTransition();
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { categoryId } = useParams<{ categoryId: string }>();
   const router = useRouter();
 
@@ -36,7 +47,13 @@ export default function DeleteCategoryRoute() {
         toast.success(response.message);
         router.push("/admin/categories");
       } else if (response.status === "error") {
-        toast.error(response.message);
+        // Check if error is about having courses
+        if (response.message.includes("khóa học")) {
+          setErrorMessage(response.message);
+          setErrorDialogOpen(true);
+        } else {
+          toast.error(response.message);
+        }
       }
     });
   };
@@ -45,10 +62,10 @@ export default function DeleteCategoryRoute() {
     <div className="max-w-xl mx-auto w-full">
       <Card className="mt-32">
         <CardHeader>
-          <CardTitle>Are you sure you want to delete this category?</CardTitle>
+          <CardTitle>Bạn có chắc chắn muốn xóa danh mục này?</CardTitle>
           <CardDescription>
-            This action cannot be undone. Courses associated with this category
-            will have their category set to null.
+            Hành động này không thể hoàn tác. Các khóa học liên kết với danh mục này
+            sẽ có danh mục được đặt về null.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-between">
@@ -56,7 +73,7 @@ export default function DeleteCategoryRoute() {
             className={buttonVariants({ variant: "outline" })}
             href={"/admin/categories"}
           >
-            Cancel
+            Hủy
           </Link>
 
           <Button
@@ -67,11 +84,34 @@ export default function DeleteCategoryRoute() {
             {isPending ? (
               <Loader2Icon className="size-4 animate-spin" />
             ) : (
-              "Delete Category"
+              "Xóa Danh mục"
             )}
           </Button>
         </CardContent>
       </Card>
+
+      {/* Error Dialog - Category has courses */}
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Không thể xóa danh mục</AlertDialogTitle>
+            <AlertDialogDescription>
+              {errorMessage || "Danh mục này không thể xóa vì có khóa học liên kết."}
+              <span className="block mt-2 text-destructive">
+                Vui lòng xóa hết các khóa học trong danh mục này trước khi xóa danh mục.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setErrorDialogOpen(false);
+              router.push("/admin/categories");
+            }}>
+              Quay lại
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

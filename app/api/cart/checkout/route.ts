@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           courseTitle: item.title,
           courseSlug: item.slug,
           coursePrice: item.price,
-          quantity: item.quantity,
+          quantity: 1,
         })),
       });
 

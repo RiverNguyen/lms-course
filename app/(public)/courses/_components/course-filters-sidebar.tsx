@@ -11,7 +11,7 @@ interface CourseFiltersSidebarProps {
   selectedCategories: string[];
   selectedLevels: string[];
   selectedPrice: "all" | "free" | "paid";
-  onCategoryChange: (categoryId: string) => void;
+  onCategoryChange: (categorySlug: string) => void;
   onLevelChange: (level: string) => void;
   onPriceChange: (price: "all" | "free" | "paid") => void;
 }
@@ -29,17 +29,17 @@ const CourseFiltersSidebar = ({
     <div className="w-full space-y-6">
       {/* Course Category */}
       <div>
-        <h3 className="font-semibold text-lg mb-4">Course Category</h3>
+        <h3 className="font-semibold text-lg mb-4">Danh mục Khóa học</h3>
         <div className="space-y-3">
           {filters.categories.map((category) => (
             <div key={category.id} className="flex items-center space-x-2">
               <Checkbox
-                id={`category-${category.id}`}
-                checked={selectedCategories.includes(category.id)}
-                onCheckedChange={() => onCategoryChange(category.id)}
+                id={`category-${category.slug}`}
+                checked={selectedCategories.includes(category.slug)}
+                onCheckedChange={() => onCategoryChange(category.slug)}
               />
               <Label
-                htmlFor={`category-${category.id}`}
+                htmlFor={`category-${category.slug}`}
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
                 <span>{category.name}</span>
@@ -56,7 +56,7 @@ const CourseFiltersSidebar = ({
 
       {/* Price */}
       <div>
-        <h3 className="font-semibold text-lg mb-4">Price</h3>
+        <h3 className="font-semibold text-lg mb-4">Giá</h3>
         <RadioGroup
           value={selectedPrice}
           onValueChange={(value) =>
@@ -70,7 +70,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="price-all"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>All</span>
+                <span>Tất cả</span>
                 <span className="text-muted-foreground">
                   {filters.prices.all}
                 </span>
@@ -82,7 +82,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="price-free"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>Free</span>
+                <span>Miễn phí</span>
                 <span className="text-muted-foreground">
                   {filters.prices.free}
                 </span>
@@ -94,7 +94,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="price-paid"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>Paid</span>
+                <span>Trả phí</span>
                 <span className="text-muted-foreground">
                   {filters.prices.paid}
                 </span>
@@ -108,7 +108,7 @@ const CourseFiltersSidebar = ({
 
       {/* Level */}
       <div>
-        <h3 className="font-semibold text-lg mb-4">Level</h3>
+        <h3 className="font-semibold text-lg mb-4">Trình độ</h3>
         <RadioGroup
           value={selectedLevels.length === 1 ? selectedLevels[0] : "all"}
           onValueChange={(value) => {
@@ -126,7 +126,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="level-all"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>All levels</span>
+                <span>Tất cả trình độ</span>
                 <span className="text-muted-foreground">
                   {filters.allLevels}
                 </span>
@@ -138,7 +138,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="level-beginner"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>Beginner</span>
+                <span>Người mới bắt đầu</span>
                 <span className="text-muted-foreground">
                   {filters.levels.Beginner || 0}
                 </span>
@@ -150,7 +150,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="level-intermediate"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>Intermediate</span>
+                <span>Trung cấp</span>
                 <span className="text-muted-foreground">
                   {filters.levels.Intermediate || 0}
                 </span>
@@ -162,7 +162,7 @@ const CourseFiltersSidebar = ({
                 htmlFor="level-advanced"
                 className="flex-1 cursor-pointer flex items-center justify-between text-sm font-normal"
               >
-                <span>Expert</span>
+                <span>Nâng cao</span>
                 <span className="text-muted-foreground">
                   {filters.levels.Advanced || 0}
                 </span>

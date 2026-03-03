@@ -81,14 +81,14 @@ export default function LessonForm({
         className={buttonVariants({ variant: "outline", className: "mb-6" })}
       >
         <ArrowLeftIcon className="size-4" />
-        <span>Go back</span>
+        <span>Quay lại</span>
       </Link>
 
       <Card>
         <CardHeader>
-          <CardTitle>Lesson Configuration</CardTitle>
+          <CardTitle>Cấu hình Bài học</CardTitle>
           <CardDescription>
-            Configure the video and description for the lesson
+            Cấu hình video và mô tả cho bài học
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -99,11 +99,11 @@ export default function LessonForm({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Lesson name</FormLabel>
+                    <FormLabel>Tên bài học</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isPending}
-                        placeholder="Enter the name of the lesson"
+                        placeholder="Nhập tên bài học"
                         {...field}
                       />
                     </FormControl>
@@ -131,7 +131,7 @@ export default function LessonForm({
                 name="thumbnailKey"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Thumbnail Image</FormLabel>
+                    <FormLabel>Ảnh bìa</FormLabel>
                     <FormControl>
                       <Uploader
                         value={field.value}
@@ -167,10 +167,10 @@ export default function LessonForm({
                 {isPending ? (
                   <>
                     <Loader2Icon className="size-4 animate-spin" />
-                    Saving lesson...
+                    Đang lưu bài học...
                   </>
                 ) : (
-                  "Save Lesson"
+                  "Lưu Bài học"
                 )}
               </Button>
             </form>

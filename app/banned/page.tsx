@@ -10,8 +10,8 @@ import { authClient } from "@/lib/auth-client";
 import { SignOutButton } from "./sign-out-button";
 
 export const metadata: Metadata = {
-  title: "Account Banned",
-  description: "Your account has been banned from TunaLMS.",
+  title: "Tài khoản Bị khóa",
+  description: "Tài khoản của bạn đã bị khóa khỏi TunaLMS.",
   robots: {
     index: false,
     follow: false,
@@ -67,16 +67,16 @@ const BannedPage = async () => {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
             <AlertCircleIcon className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="text-2xl">Account Banned</CardTitle>
+          <CardTitle className="text-2xl">Tài khoản Bị khóa</CardTitle>
           <CardDescription>
-            Your account has been suspended from TunaLMS
+            Tài khoản của bạn đã bị đình chỉ khỏi TunaLMS
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {user.banReason && (
             <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
               <p className="text-sm font-medium text-destructive mb-2">
-                Reason for ban:
+                Lý do khóa:
               </p>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                 {user.banReason}
@@ -86,29 +86,29 @@ const BannedPage = async () => {
 
           {banExpiresDate ? (
             <p className="text-sm text-muted-foreground text-center">
-              This ban will expire on <strong>{banExpiresDate}</strong>
+              Lệnh khóa này sẽ hết hạn vào <strong>{banExpiresDate}</strong>
             </p>
           ) : (
             <p className="text-sm text-muted-foreground text-center">
-              This is a permanent ban.
+              Đây là lệnh khóa vĩnh viễn.
             </p>
           )}
 
           <div className="rounded-lg border bg-muted/50 p-4">
             <p className="text-sm text-muted-foreground mb-2">
-              <strong>What this means:</strong>
+              <strong>Điều này có nghĩa là:</strong>
             </p>
             <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-              <li>You cannot access your account</li>
-              <li>You cannot access your enrolled courses</li>
-              <li>All access privileges have been revoked</li>
+              <li>Bạn không thể truy cập tài khoản của mình</li>
+              <li>Bạn không thể truy cập các khóa học đã đăng ký</li>
+              <li>Tất cả quyền truy cập đã bị thu hồi</li>
             </ul>
           </div>
 
           <div className="rounded-lg border bg-blue-50 dark:bg-blue-950/20 p-4">
             <p className="text-sm text-muted-foreground mb-2">
-              If you believe this is a mistake or would like to appeal this
-              decision, please contact us:
+              Nếu bạn cho rằng đây là sự nhầm lẫn hoặc muốn khiếu nại quyết định này,
+              vui lòng liên hệ với chúng tôi:
             </p>
             <div className="flex items-center gap-2 text-sm">
               <MailIcon className="h-4 w-4" />

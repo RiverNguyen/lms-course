@@ -1,4 +1,4 @@
-import { BookOpen, HomeIcon, LayoutDashboard, LogOutIcon, ShieldUser } from "lucide-react";
+import { BookOpen, Heart, HomeIcon, LayoutDashboard, LogOutIcon, ShieldUser } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,26 +17,31 @@ import Link from "next/link";
 const listItems = [
   {
     icon: HomeIcon,
-    property: "Home",
+    property: "Trang chủ",
     href: "/",
   },
   {
     icon: BookOpen,
-    property: "Courses",
+    property: "Khóa học",
     href: "/courses",
   },
   {
+    icon: Heart,
+    property: "Danh sách yêu thích",
+    href: "/wishlist",
+  },
+  {
     icon: LayoutDashboard,
-    property: "Dashboard",
+    property: "Bảng điều khiển",
     href: "/dashboard",
   },
 ];
 
 interface IAppProps {
-  name: string;
-  email: string;
-  image: string;
-  role: string;
+  name?: string;
+  email?: string;
+  image?: string;
+  role?: string;
 }
 
 const UserDropdown = ({ name, email, image, role }: IAppProps) => {
@@ -47,17 +52,19 @@ const UserDropdown = ({ name, email, image, role }: IAppProps) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={image} alt="User avatar" />
-            <AvatarFallback>{name[0].toLocaleUpperCase()}</AvatarFallback>
+            <AvatarImage src={image} alt="Ảnh đại diện người dùng" />
+            <AvatarFallback>
+              {(name?.[0] ?? email?.[0] ?? "?").toLocaleUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-48">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{name}</p>
+            <p className="text-sm font-medium leading-none">{name ?? "Người dùng"}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {email}
+              {email ?? ""}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -75,7 +82,7 @@ const UserDropdown = ({ name, email, image, role }: IAppProps) => {
             <DropdownMenuItem asChild>
               <Link href="/admin">
                 <ShieldUser className="size-4" />
-                <span className="text-popover-foreground">Admin</span>
+                <span className="text-popover-foreground">Quản trị</span>
               </Link>
             </DropdownMenuItem>
           )}
@@ -83,7 +90,7 @@ const UserDropdown = ({ name, email, image, role }: IAppProps) => {
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOutIcon className="size-4" />
-            <span className="text-popover-foreground">Logout</span>
+            <span className="text-popover-foreground">Đăng xuất</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

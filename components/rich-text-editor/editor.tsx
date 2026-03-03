@@ -5,6 +5,19 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { ControllerRenderProps, FieldValues, FieldPath } from "react-hook-form";
+import { useEffect } from "react";
+
+/** Parses value as Tiptap content: accepts JSON (ProseMirror) or HTML string. */
+function parseEditorContent(value: string | undefined): string | object {
+  if (!value?.trim()) return "<p>Hello World</p>";
+  const trimmed = value.trim();
+  if (trimmed.startsWith("<")) return trimmed;
+  try {
+    return JSON.parse(value) as object;
+  } catch {
+    return trimmed;
+  }
+}
 
 export const RichTextEditor = <
   TFieldValues extends FieldValues = FieldValues,
@@ -24,7 +37,7 @@ export const RichTextEditor = <
       }),
     ],
     immediatelyRender: false,
-    content: field.value ? JSON.parse(field.value) : "<p>Hello World</p>",
+    content: parseEditorContent(field.value),
     editorProps: {
       attributes: {
         class:
@@ -35,6 +48,25 @@ export const RichTextEditor = <
       field.onChange(JSON.stringify(editor.getJSON()));
     },
   });
+
+  // Update editor content when field.value changes externally (e.g., from AI)
+  useEffect(() => {
+    if (!editor) return;
+
+    try {
+      const currentContent = JSON.stringify(editor.getJSON());
+      const newContent = field.value ?? "";
+
+      // Only update if content actually changed (avoid infinite loops)
+      if (newContent && currentContent !== newContent) {
+        const parsedContent = parseEditorContent(newContent);
+        editor.commands.setContent(parsedContent);
+      }
+    } catch (error) {
+      console.error("Failed to parse editor content:", error);
+      editor.commands.setContent({ type: "doc", content: [{ type: "paragraph" }] });
+    }
+  }, [field.value, editor]);
 
   return (
     <div className="w-full border border-input rounded-lg overflow-hidden dark:bg-input/30">

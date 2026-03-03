@@ -29,7 +29,7 @@ export const EnrollmentButton = ({ courseId }: { courseId: string }) => {
 
   return (
     <Button className="w-full" onClick={onSubmit} disabled={isPending}>
-      {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Enroll Now!'}
+      {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Đăng ký Ngay!'}
     </Button>
   )
 }

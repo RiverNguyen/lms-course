@@ -75,7 +75,7 @@ const Uploader = ({
         });
 
         if (!presignedResponse.ok) {
-          toast.error("Failed to get presigned URL");
+          toast.error("Không thể lấy URL được ký");
           setFileState((prev) => ({
             ...prev,
             uploading: false,
@@ -112,7 +112,7 @@ const Uploader = ({
 
               onChange?.(key);
 
-              toast.success("File uploaded successfully");
+              toast.success("Tệp đã được tải lên thành công");
               resolve();
             } else {
               reject(new Error("Failed to upload file"));
@@ -121,7 +121,7 @@ const Uploader = ({
 
           xhr.onerror = () => {
             reject(new Error("Failed to upload file"));
-            toast.error("Failed to upload file");
+            toast.error("Không thể tải lên tệp");
           };
 
           xhr.open("PUT", presignedUrl);
@@ -186,7 +186,7 @@ const Uploader = ({
       });
 
       if (!res.ok) {
-        toast.error("Failed to delete file");
+        toast.error("Không thể xóa tệp");
         setFileState((prev) => ({
           ...prev,
           isDeleting: true,
@@ -212,7 +212,7 @@ const Uploader = ({
         isDeleting: false,
       }));
 
-      toast.success("File deleted successfully");
+      toast.success("Tệp đã được xóa thành công");
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete file");
@@ -239,7 +239,7 @@ const Uploader = ({
       );
 
       if (isImage) {
-        toast.error("Only images are allowed");
+        toast.error("Chỉ cho phép hình ảnh");
       }
 
       if (fileTooLarge) {
@@ -247,7 +247,7 @@ const Uploader = ({
       }
 
       if (tooManyFiles) {
-        toast.error("You can only upload one file at a time");
+        toast.error("Bạn chỉ có thể tải lên một tệp tại một thời điểm");
       }
     }
   };

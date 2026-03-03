@@ -85,10 +85,22 @@ const statusColors: Record<CourseStatus, string> = {
   Archived: "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20",
 }
 
+const statusLabels: Record<CourseStatus, string> = {
+  Draft: "Bản nháp",
+  Published: "Đã xuất bản",
+  Archived: "Đã lưu trữ",
+}
+
 const levelColors: Record<string, string> = {
   Beginner: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
   Intermediate: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
   Advanced: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+}
+
+const levelLabels: Record<string, string> = {
+  Beginner: "Người mới bắt đầu",
+  Intermediate: "Trung cấp",
+  Advanced: "Nâng cao",
 }
 
 interface CoursesTableProps {
@@ -137,11 +149,12 @@ export function CoursesTable({ courses }: CoursesTableProps) {
     {
       id: "select",
       enableHiding: false,
+      size: 44,
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
+          aria-label="Chọn dòng"
         />
       ),
       header: ({ table }) => (
@@ -151,12 +164,13 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label="Chọn tất cả"
         />
       ),
     },
     {
       accessorKey: "title",
+      size: 280,
       header: ({ column }) => {
         return (
           <Button
@@ -164,14 +178,14 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Title
+            Tiêu đề
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
         return (
-          <div className="max-w-[300px]">
+          <div className="min-w-0 max-w-[320px]">
             <Link
               href={`/admin/courses/${row.original.id}/edit`}
               className="font-medium hover:underline hover:text-primary transition-colors"
@@ -196,7 +210,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Status
+            Trạng thái
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -208,17 +222,18 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             variant="outline"
             className={statusColors[status]}
           >
-            {status}
+            {statusLabels[status] ?? status}
           </Badge>
         )
       },
       filterFn: (row, id, value) => {
         return value.includes(row.getValue(id))
       },
+      size: 120,
     },
     {
       accessorKey: "level",
-      header: "Level",
+      header: "Trình độ",
       cell: ({ row }) => {
         const level = row.getValue("level") as string
         return (
@@ -226,17 +241,57 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             variant="outline"
             className={levelColors[level] || ""}
           >
-            {level}
+            {levelLabels[level] ?? level}
           </Badge>
         )
       },
+      size: 120,
     },
     {
       accessorKey: "duration",
-      header: "Duration",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="h-8 px-2 lg:px-3 w-full justify-end"
+        >
+          Thời lượng
+          <ArrowUpDownIcon className="ml-2 h-4 w-4 shrink-0" />
+        </Button>
+      ),
       cell: ({ row }) => {
-        return <div className="text-sm">{row.getValue("duration")} hours</div>
+        return (
+          <div className="text-sm text-center tabular-nums whitespace-nowrap w-full">
+            {row.getValue("duration")} giờ
+          </div>
+        )
       },
+      size: 100,
+    },
+    {
+      id: "enrollments",
+      accessorFn: (row) => row._count?.enrollments ?? 0,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="h-8 px-2 lg:px-3 w-full justify-center"
+          >
+            Số học viên
+            <ArrowUpDownIcon className="ml-2 h-4 w-4 shrink-0" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const count = row.original._count?.enrollments ?? 0
+        return (
+          <div className="text-sm tabular-nums text-center w-full">
+            {count}
+          </div>
+        )
+      },
+      size: 50,
     },
     {
       accessorKey: "price",
@@ -245,24 +300,25 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-8 px-2 lg:px-3"
+            className="h-8 px-2 lg:px-3 w-full justify-end"
           >
-            Price
-            <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+            Giá
+            <ArrowUpDownIcon className="ml-2 h-4 w-4 shrink-0" />
           </Button>
         )
       },
       cell: ({ row }) => {
         const price = parseFloat(row.getValue("price"))
         return (
-          <div className="text-sm font-medium">
-            {new Intl.NumberFormat("en-US", {
+          <div className="text-sm font-medium text-right tabular-nums whitespace-nowrap">
+            {new Intl.NumberFormat("vi-VN", {
               style: "currency",
-              currency: "USD",
+              currency: "VND",
             }).format(price)}
           </div>
         )
       },
+      size: 120,
     },
     {
       accessorKey: "createdAt",
@@ -271,21 +327,22 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-8 px-2 lg:px-3"
+            className="h-8 px-2 lg:px-3 w-full justify-end"
           >
-            Created
-            <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+            Ngày tạo
+            <ArrowUpDownIcon className="ml-2 h-4 w-4 shrink-0" />
           </Button>
         )
       },
       cell: ({ row }) => {
         const date = new Date(row.getValue("createdAt"))
         return (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground text-center whitespace-nowrap">
             {formatDate(date)}
           </div>
         )
       },
+      size: 110,
     },
     {
       accessorKey: "updatedAt",
@@ -294,10 +351,10 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="h-8 px-2 lg:px-3"
+            className="h-8 px-2 lg:px-3 w-full justify-end"
           >
-            Updated
-            <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+            Cập nhật
+            <ArrowUpDownIcon className="ml-2 h-4 w-4 shrink-0" />
           </Button>
         )
       },
@@ -309,10 +366,12 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           </div>
         )
       },
+      size: 110,
     },
     {
       id: "actions",
       enableHiding: false,
+      size: 64,
       cell: ({ row }) => {
         const course = row.original
 
@@ -320,22 +379,22 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Mở menu</span>
                 <MoreHorizontalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
               <DropdownMenuItem asChild>
                 <Link href={`/admin/courses/${course.id}/edit`}>
                   <PencilIcon className="mr-2 h-4 w-4" />
-                  Edit Course
+                  Chỉnh sửa Khóa học
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href={`/courses/${course.slug}`}>
                   <EyeIcon className="mr-2 h-4 w-4" />
-                  Preview Course
+                  Xem trước Khóa học
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -344,7 +403,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                 onClick={() => router.push(`/admin/courses/${course.id}/delete`)}
               >
                 <Trash2Icon className="mr-2 h-4 w-4" />
-                Delete Course
+                Xóa Khóa học
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -433,7 +492,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <div className="relative flex-1 max-w-sm">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search courses..."
+              placeholder="Tìm kiếm khóa học..."
               value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("title")?.setFilterValue(event.target.value)
@@ -452,13 +511,13 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="Lọc theo trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Published">Published</SelectItem>
-              <SelectItem value="Draft">Draft</SelectItem>
-              <SelectItem value="Archived">Archived</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value="Published">Đã xuất bản</SelectItem>
+              <SelectItem value="Draft">Bản nháp</SelectItem>
+              <SelectItem value="Archived">Đã lưu trữ</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -466,12 +525,12 @@ export function CoursesTable({ courses }: CoursesTableProps) {
         {selectedRows.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground">
-              {selectedRows.length} selected
+              {selectedRows.length} đã chọn
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" disabled={isPending}>
-                  Change Status
+                  Đổi Trạng thái
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -481,7 +540,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                     setStatusDialogOpen(true)
                   }}
                 >
-                  Set to Published
+                  Đặt thành Đã xuất bản
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -489,7 +548,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                     setStatusDialogOpen(true)
                   }}
                 >
-                  Set to Draft
+                  Đặt thành Bản nháp
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -497,7 +556,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                     setStatusDialogOpen(true)
                   }}
                 >
-                  Set to Archived
+                  Đặt thành Đã lưu trữ
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -508,7 +567,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
               disabled={isPending}
             >
               <Trash2Icon className="mr-2 h-4 w-4" />
-              Delete Selected
+              Xóa đã chọn
             </Button>
           </div>
         )}
@@ -520,18 +579,20 @@ export function CoursesTable({ courses }: CoursesTableProps) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    style={{ minWidth: header.getSize() }}
+                    className="align-middle"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -542,14 +603,27 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isNumeric =
+                      cell.column.id === "duration" ||
+                      cell.column.id === "enrollments" ||
+                      cell.column.id === "price" ||
+                      cell.column.id === "createdAt" ||
+                      cell.column.id === "updatedAt"
+                    const isTitle = cell.column.id === "title"
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        style={{ minWidth: cell.column.getSize(), ...(isTitle ? { maxWidth: cell.column.getSize() } : {}) }}
+                        className={`align-middle ${isNumeric ? "text-right" : ""} ${isTitle ? "overflow-hidden" : ""}`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (
@@ -558,7 +632,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No courses found.
+                  Không tìm thấy khóa học nào.
                 </TableCell>
               </TableRow>
             )}
@@ -569,17 +643,17 @@ export function CoursesTable({ courses }: CoursesTableProps) {
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {table.getRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} course(s)
+          Hiển thị {table.getRowModel().rows.length} trong{" "}
+          {table.getFilteredRowModel().rows.length} khóa học
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span className="ml-2">
-              ({table.getFilteredSelectedRowModel().rows.length} selected)
+              ({table.getFilteredSelectedRowModel().rows.length} đã chọn)
             </span>
           )}
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <span className="text-sm text-muted-foreground">Dòng mỗi trang:</span>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -606,10 +680,10 @@ export function CoursesTable({ courses }: CoursesTableProps) {
               disabled={!table.getCanPreviousPage()}
             >
               <ChevronLeftIcon className="h-4 w-4" />
-              Previous
+              Trước
             </Button>
             <div className="text-sm text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              Trang {table.getState().pagination.pageIndex + 1} /{" "}
               {table.getPageCount()}
             </div>
             <Button
@@ -618,7 +692,7 @@ export function CoursesTable({ courses }: CoursesTableProps) {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              Sau
               <ChevronRightIcon className="h-4 w-4" />
             </Button>
           </div>
@@ -629,21 +703,21 @@ export function CoursesTable({ courses }: CoursesTableProps) {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete{" "}
-              <strong>{selectedRows.length}</strong> course(s).
+              Hành động này không thể hoàn tác. Sẽ xóa vĩnh viễn{" "}
+              <strong>{selectedRows.length}</strong> khóa học.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -653,10 +727,10 @@ export function CoursesTable({ courses }: CoursesTableProps) {
       <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Update Course Status</AlertDialogTitle>
+            <AlertDialogTitle>Cập nhật Trạng thái Khóa học</AlertDialogTitle>
             <AlertDialogDescription>
-              This will change the status of <strong>{selectedRows.length}</strong>{" "}
-              course(s) to <strong>{selectedStatus}</strong>.
+              Sẽ thay đổi trạng thái của <strong>{selectedRows.length}</strong>{" "}
+              khóa học thành <strong>{selectedStatus ? statusLabels[selectedStatus] : selectedStatus}</strong>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -666,14 +740,14 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                 setSelectedStatus(null)
               }}
             >
-              Cancel
+              Hủy
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => selectedStatus && handleBulkStatusUpdate(selectedStatus)}
               disabled={isPending || !selectedStatus}
             >
               {isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              Update
+              Cập nhật
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

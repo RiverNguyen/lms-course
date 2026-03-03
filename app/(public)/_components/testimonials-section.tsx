@@ -8,35 +8,35 @@ import { motion } from "motion/react";
 const testimonials = [
   {
     name: "Sarah Johnson",
-    role: "Software Developer",
+    role: "Lập trình viên",
     image: "https://avatar.vercel.sh/sarah",
     rating: 5,
     comment:
-      "TunaLMS has transformed my learning experience. The courses are comprehensive and the instructors are top-notch. I've gained valuable skills that directly helped me advance in my career.",
+      "TunaLMS đã thay đổi trải nghiệm học tập của tôi. Các khóa học rất toàn diện và giảng viên rất xuất sắc. Tôi đã có được những kỹ năng quý giá giúp tôi thăng tiến trong sự nghiệp.",
   },
   {
     name: "Michael Chen",
-    role: "Marketing Manager",
+    role: "Quản lý Marketing",
     image: "https://avatar.vercel.sh/michael",
     rating: 5,
     comment:
-      "The flexibility to learn at my own pace while having access to expert guidance is incredible. The platform is intuitive and the content quality is outstanding.",
+      "Tính linh hoạt để học theo tốc độ của riêng tôi trong khi có quyền truy cập vào hướng dẫn chuyên gia thật tuyệt vời. Nền tảng rất trực quan và chất lượng nội dung rất xuất sắc.",
   },
   {
     name: "Emily Rodriguez",
-    role: "Designer",
+    role: "Nhà thiết kế",
     image: "https://avatar.vercel.sh/emily",
     rating: 5,
     comment:
-      "I've completed multiple courses on TunaLMS and each one exceeded my expectations. The practical projects and real-world examples make learning engaging and effective.",
+      "Tôi đã hoàn thành nhiều khóa học trên TunaLMS và mỗi khóa học đều vượt quá mong đợi của tôi. Các dự án thực tế và ví dụ thực tế làm cho việc học trở nên hấp dẫn và hiệu quả.",
   },
   {
     name: "David Thompson",
-    role: "Business Analyst",
+    role: "Nhà phân tích Kinh doanh",
     image: "https://avatar.vercel.sh/david",
     rating: 5,
     comment:
-      "The certificate I earned from TunaLMS helped me land my dream job. The courses are well-structured and the community support is amazing.",
+      "Chứng chỉ tôi nhận được từ TunaLMS đã giúp tôi có được công việc mơ ước. Các khóa học được cấu trúc tốt và sự hỗ trợ từ cộng đồng thật tuyệt vời.",
   },
 ];
 
@@ -52,10 +52,10 @@ export const TestimonialsSection = () => {
           className="text-center space-y-4 mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            What Our Students Say
+            Học viên Nói gì về Chúng tôi
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of satisfied learners who have transformed their careers with our courses
+            Tham gia cùng hàng nghìn người học hài lòng đã thay đổi sự nghiệp của họ với các khóa học của chúng tôi
           </p>
         </motion.div>
 

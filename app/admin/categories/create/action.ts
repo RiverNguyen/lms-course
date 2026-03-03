@@ -29,12 +29,12 @@ export const CreateCategory = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "You are a bot!",
+          message: "Bạn là bot!",
         };
       }
     }
@@ -43,7 +43,7 @@ export const CreateCategory = async (
     if (!validation.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
@@ -57,7 +57,7 @@ export const CreateCategory = async (
     if (existingCategory) {
       return {
         status: "error",
-        message: "A category with this slug already exists",
+        message: "Một danh mục với slug này đã tồn tại",
       };
     }
 
@@ -69,12 +69,12 @@ export const CreateCategory = async (
 
     return {
       status: "success",
-      message: "Category created successfully",
+      message: "Danh mục đã được tạo thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

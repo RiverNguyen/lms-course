@@ -52,10 +52,10 @@ export default function CertificateView({
       link.click();
       document.body.removeChild(link);
 
-      toast.success("Certificate exported as image!");
+      toast.success("Chứng chỉ đã được xuất dưới dạng hình ảnh!");
     } catch (error) {
       console.error("Error exporting image:", error);
-      toast.error(`Failed to export image: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast.error(`Không thể xuất hình ảnh: ${error instanceof Error ? error.message : "Lỗi không xác định"}`);
     } finally {
       setIsExporting(false);
     }
@@ -105,10 +105,10 @@ export default function CertificateView({
       pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save(`certificate-${certificateNumber}.pdf`);
 
-      toast.success("Certificate exported as PDF!");
+      toast.success("Chứng chỉ đã được xuất dưới dạng PDF!");
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast.error(`Không thể xuất PDF: ${error instanceof Error ? error.message : "Lỗi không xác định"}`);
     } finally {
       setIsExporting(false);
     }
@@ -125,7 +125,7 @@ export default function CertificateView({
           className="gap-2"
         >
           <FileImage className="size-4" />
-          Export Image
+          Xuất Hình ảnh
         </Button>
         <Button
           variant="outline"
@@ -134,7 +134,7 @@ export default function CertificateView({
           className="gap-2"
         >
           <FileText className="size-4" />
-          Export PDF
+          Xuất PDF
         </Button>
       </div>
 
@@ -174,10 +174,10 @@ export default function CertificateView({
 
             {/* Title */}
             <h1 className="text-6xl font-bold mb-4 text-center tracking-wide drop-shadow-lg">
-              Certificate of Completion
+              Chứng chỉ Hoàn thành
             </h1>
             <p className="text-xl text-blue-100 mb-14 text-center font-light">
-              This certifies that the following course has been completed
+              Chứng nhận rằng khóa học sau đây đã được hoàn thành
             </p>
 
             {/* Recipient Info */}
@@ -209,7 +209,7 @@ export default function CertificateView({
                 <Calendar className="size-6 text-yellow-400" />
               </div>
               <div className="text-left">
-                <p className="text-sm text-blue-200 mb-1 font-light">Date Issued</p>
+                <p className="text-sm text-blue-200 mb-1 font-light">Ngày cấp</p>
                 <p className="text-xl font-bold">
                   {format(new Date(issuedAt), "dd/MM/yyyy")}
                 </p>
@@ -218,7 +218,7 @@ export default function CertificateView({
 
             {/* Certificate Number */}
             <div className="text-center">
-              <p className="text-xs text-blue-300/70 mb-1 font-light">Certificate Number</p>
+              <p className="text-xs text-blue-300/70 mb-1 font-light">Số chứng chỉ</p>
               <p className="text-base font-mono font-bold tracking-wider">{certificateNumber}</p>
             </div>
           </div>

@@ -4,6 +4,7 @@ import {
   IconDashboard,
   IconDotsVertical,
   IconLogout,
+  IconSettings,
 } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -109,9 +110,15 @@ export function NavUser() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/admin">
+                <Link href="/dashboard">
                   <IconDashboard />
                   Dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">
+                  <IconSettings />
+                  Cài đặt
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>

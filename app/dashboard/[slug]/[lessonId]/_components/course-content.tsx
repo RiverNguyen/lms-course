@@ -1,11 +1,14 @@
 "use client"
 
 import { LessonContent } from "@/app/data/course/get-lesson-content";
+import type { LessonNoteType } from "@/app/data/course/get-lesson-notes";
+import type { LessonBookmarkType } from "@/app/data/course/get-lesson-bookmarks";
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { VideoPlayer } from "./video-player";
-import { useTransition, useState, useEffect } from "react";
+import { VideoPlayer, type VideoPlayerHandle } from "./video-player";
+import { LessonNotesBookmarks } from "./lesson-notes-bookmarks";
+import { useTransition, useState, useEffect, useRef } from "react";
 import { markLessonAsCompletedAction } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
@@ -13,13 +16,22 @@ import { useConfetti } from "@/hooks/use-confetti";
 import { useRouter } from "next/navigation";
 
 interface CourseContentProps {
-  data: LessonContent
+  data: LessonContent;
+  slug: string;
+  initialNote: LessonNoteType;
+  initialBookmarks: LessonBookmarkType[];
 }
 
-export default function CourseContent({ data }: CourseContentProps) {
+export default function CourseContent({
+  data,
+  slug,
+  initialNote,
+  initialBookmarks,
+}: CourseContentProps) {
   const [isPending, startTransition] = useTransition();
-  const { triggerConfetti } = useConfetti()
+  const { triggerConfetti } = useConfetti();
   const router = useRouter();
+  const videoRef = useRef<VideoPlayerHandle>(null);
   const [isCompleted, setIsCompleted] = useState(data.lessonProgresses.length > 0);
 
   // Update completion status when data changes (e.g., after revalidation)
@@ -51,7 +63,7 @@ export default function CourseContent({ data }: CourseContentProps) {
           triggerConfetti();
           // Show certificate notification after confetti
           setTimeout(() => {
-            toast.success("Chứng chỉ đã được cấp! Xem trong trang Certificates.", {
+            toast.success("Chứng chỉ đã được cấp! Xem trong trang Chứng chỉ.", {
               action: {
                 label: "Xem ngay",
                 onClick: () => window.location.href = "/dashboard/certificates",
@@ -76,11 +88,14 @@ export default function CourseContent({ data }: CourseContentProps) {
       }
     });
   };
+  const courseSlug = data.chapter.course?.slug ?? slug;
+
   return (
     <div className="flex flex-col h-full bg-background pl-6">
-      <VideoPlayer 
-        thumbnailKey={data.thumbnailKey || ''} 
-        videoKey={data.videoKey || ''} 
+      <VideoPlayer
+        ref={videoRef}
+        thumbnailKey={data.thumbnailKey || ""}
+        videoKey={data.videoKey || ""}
         onVideoEnd={markLessonAsCompleted}
       />
       <div className="py-4 border-b">
@@ -92,14 +107,26 @@ export default function CourseContent({ data }: CourseContentProps) {
         ) : (
           <Button variant={"outline"} disabled={isPending} onClick={markLessonAsCompleted}>
             {isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle className="size-4 mr-2 text-green-500" />}
-            Mark as completed
+            Đánh dấu đã hoàn thành
           </Button>
         )}
       </div>
 
       <div className="space-y-3 pt-3">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">{data.title}</h1>
-        {data.description && (<RenderDescription description={JSON.parse(data.description)} />)}
+        {data.description && <RenderDescription description={JSON.parse(data.description)} />}
+      </div>
+
+      <div className="mt-6">
+        <h2 className="mb-2 text-lg font-semibold">Ghi chú &amp; Bookmarks</h2>
+        <LessonNotesBookmarks
+          lessonId={data.id}
+          slug={slug}
+          courseSlug={courseSlug}
+          initialNote={initialNote}
+          initialBookmarks={initialBookmarks}
+          videoRef={videoRef}
+        />
       </div>
     </div>
   );

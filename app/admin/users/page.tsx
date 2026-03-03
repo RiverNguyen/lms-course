@@ -9,9 +9,9 @@ const UsersPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Users</h1>
+          <h1 className="text-3xl font-bold">Người dùng</h1>
           <p className="text-muted-foreground mt-1">
-            Manage and monitor all users
+            Quản lý và theo dõi tất cả người dùng
           </p>
         </div>
       </div>
@@ -32,8 +32,10 @@ async function RenderUsers() {
         <UsersTable users={data} />
       ) : (
         <EmptyState
-          title="No users found"
-          description="Users will appear here once they register"
+          title="Chưa có người dùng nào"
+          description="Người dùng sẽ hiển thị ở đây khi họ đăng ký"
+          buttonText=""
+          href=""
         />
       )}
     </>

@@ -2,6 +2,7 @@ import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { sendEnrollmentSuccessEmail } from "@/lib/emails/enrollment-success";
+import { sendCartCheckoutSuccessEmail } from "@/lib/emails/cart-checkout-success";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 
@@ -49,8 +50,16 @@ export const POST = async (req: Request) => {
         },
         include: {
           orderItems: true,
+          coupon: true,
         }
       })
+
+      if (order.couponId && order.coupon) {
+        await prisma.coupon.update({
+          where: { id: order.couponId },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
 
       // Create enrollments for each course in the order
       for (const orderItem of order.orderItems) {
@@ -84,6 +93,24 @@ export const POST = async (req: Request) => {
             }
           })
         }
+      }
+
+      // Send cart checkout success email
+      try {
+        await sendCartCheckoutSuccessEmail({
+          userEmail: user.email,
+          userName: user.name,
+          orderNumber: order.orderNumber,
+          total: order.total,
+          courses: order.orderItems.map((item) => ({
+            title: item.courseTitle,
+            slug: item.courseSlug,
+            price: item.coursePrice,
+          })),
+        });
+      } catch (emailError) {
+        // Log email error but don't fail the webhook
+        console.error('Failed to send cart checkout success email:', emailError);
       }
     } 
     // Handle single course enrollment (existing flow)

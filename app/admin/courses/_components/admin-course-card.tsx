@@ -54,7 +54,7 @@ const AdminCourseCard = ({ course }: AdminCourseCardProps) => {
             <DropdownMenuItem asChild>
               <Link href={`/admin/courses/${course?.id}/delete`}>
                 <Trash2Icon className="size-4 mr-2 text-destructive" />
-                Delete Course
+                Xóa Khóa học
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -84,7 +84,7 @@ const AdminCourseCard = ({ course }: AdminCourseCardProps) => {
           <div className="flex items-center gap-x-2">
             <TimerIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
             <p className="text-xsm text-muted-foreground">
-              {course?.duration} hours
+              {course?.duration} giờ
             </p>
           </div>
           <div className="flex items-center gap-x-2">
@@ -99,7 +99,7 @@ const AdminCourseCard = ({ course }: AdminCourseCardProps) => {
             className: "w-full mt-4",
           })}
         >
-          Edit Course <ArrowRightIcon className="size-4" />
+          Chỉnh sửa Khóa học <ArrowRightIcon className="size-4" />
         </Link>
       </CardContent>
     </Card>

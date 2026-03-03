@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         {
           status: "error",
           message: "Dữ liệu không hợp lệ",
-          errors: validationResult.error.errors,
+          errors: validationResult.error.flatten().fieldErrors,
         },
         { status: 400 }
       );

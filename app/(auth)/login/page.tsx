@@ -5,15 +5,15 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign In",
-  description: "Sign in to your TunaLMS account to access your courses and continue your learning journey.",
+  title: "Đăng nhập",
+  description: "Đăng nhập vào tài khoản TunaLMS của bạn để truy cập các khóa học và tiếp tục hành trình học tập.",
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: "Sign In - TunaLMS",
-    description: "Sign in to your TunaLMS account to access your courses.",
+    title: "Đăng nhập - TunaLMS",
+    description: "Đăng nhập vào tài khoản TunaLMS của bạn để truy cập các khóa học.",
     url: "/login",
   },
 };

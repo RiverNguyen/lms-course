@@ -22,23 +22,23 @@ import { adminGetEnrollmentStatusData } from "@/app/data/admin/admin-get-chart-d
 
 const chartConfig = {
   Pending: {
-    label: "Pending",
+    label: "Đang chờ",
     color: "hsl(220 13% 91%)",
   },
   Active: {
-    label: "Active",
+    label: "Đang học",
     color: "hsl(142 76% 36%)",
   },
   Completed: {
-    label: "Completed",
+    label: "Hoàn thành",
     color: "hsl(38 92% 50%)",
   },
   Refunded: {
-    label: "Refunded",
+    label: "Đã hoàn tiền",
     color: "hsl(0 84% 60%)",
   },
   Cancelled: {
-    label: "Cancelled",
+    label: "Đã hủy",
     color: "hsl(280 67% 51%)",
   },
 } satisfies ChartConfig
@@ -58,9 +58,9 @@ export function ChartEnrollmentStatus({ data }: ChartEnrollmentStatusProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Enrollment Status Distribution</CardTitle>
+        <CardTitle>Phân bố trạng thái ghi danh</CardTitle>
         <CardDescription>
-          Total enrollments: {total}
+          Tổng số ghi danh: {total}
         </CardDescription>
       </CardHeader>
       <CardContent>

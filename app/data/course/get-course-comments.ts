@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 
 export const getCourseComments = async (courseId: string) => {
-  const comments = await prisma.comment.findMany({
+  const comments = await prisma.review.findMany({
     where: {
       courseId,
     },

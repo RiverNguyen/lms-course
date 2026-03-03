@@ -6,6 +6,7 @@ import {
   IconFileAi,
   IconFileDescription,
   IconHelp,
+  IconReceipt,
   IconSearch,
   IconSettings,
   IconCertificate
@@ -32,14 +33,24 @@ import Logo from "@/public/logo.svg";
 const data = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "Bảng điều khiển",
       url: "/dashboard",
       icon: IconDashboard,
     },
     {
-      title: "Certificates",
+      title: "Chứng chỉ",
       url: "/dashboard/certificates",
       icon: IconCertificate,
+    },
+    {
+      title: "Lịch sử mua hàng",
+      url: "/dashboard/orders",
+      icon: IconReceipt,
+    },
+    {
+      title: "Cài đặt",
+      url: "/dashboard/settings",
+      icon: IconSettings,
     },
   ],
   navClouds: [
@@ -90,23 +101,6 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
 };
 
 export function DashboardAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -135,7 +129,7 @@ export function DashboardAppSidebar({ ...props }: React.ComponentProps<typeof Si
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

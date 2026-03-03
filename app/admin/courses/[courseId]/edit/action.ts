@@ -16,7 +16,7 @@ import {
   lessonSchema,
 } from "@/lib/zod-schemas";
 import { request } from "@arcjet/next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -42,12 +42,12 @@ export const EditCourse = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "You are a bot!",
+          message: "Bạn là bot!",
         };
       }
     }
@@ -56,11 +56,11 @@ export const EditCourse = async (
     if (!result.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
-    // Get current course to check for Stripe product
+    // Get current course to check for Stripe product and status
     const currentCourse = await prisma.course.findUnique({
       where: {
         id: courseId,
@@ -68,13 +68,15 @@ export const EditCourse = async (
       },
       select: {
         stripePriceId: true,
+        status: true,
+        slug: true,
       },
     });
 
     if (!currentCourse) {
       return {
         status: "error",
-        message: "Course not found",
+        message: "Không tìm thấy khóa học",
       };
     }
 
@@ -88,7 +90,7 @@ export const EditCourse = async (
         const productId = typeof price.product === 'string' ? price.product : price.product.id;
 
         // Check if price has changed
-        const newPriceAmount = Number(result.data.price) * 100;
+        const newPriceAmount = Number(result.data.price);
         const priceChanged = price.unit_amount !== newPriceAmount;
 
         // Update the product
@@ -102,7 +104,7 @@ export const EditCourse = async (
         if (priceChanged) {
           const newPrice = await stripe.prices.create({
             product: productId,
-            currency: 'usd',
+            currency: 'vnd',
             unit_amount: newPriceAmount,
           });
 
@@ -139,14 +141,26 @@ export const EditCourse = async (
       },
     });
 
+    // Thông báo "Khóa mới" khi chuyển sang Published
+    const wasNotPublished =
+      currentCourse.status !== "Published";
+    if (wasNotPublished && result.data.status === "Published") {
+      const { notifyNewCourse } = await import(
+        "@/app/data/notification/notification-service"
+      );
+      notifyNewCourse(result.data.title, result.data.slug).catch((err) =>
+        console.error("notifyNewCourse failed:", err)
+      );
+    }
+
     return {
       status: "success",
-      message: "Course updated successfully",
+      message: "Khóa học đã được cập nhật thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -161,7 +175,7 @@ export const ReorderLessons = async (
     if (!lessons || lessons.length === 0) {
       return {
         status: "error",
-        message: "Lessons are required",
+        message: "Bài học là bắt buộc",
       };
     }
 
@@ -180,15 +194,17 @@ export const ReorderLessons = async (
     await prisma.$transaction(updates);
 
     revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Lessons reordered successfully",
+      message: "Bài học đã được sắp xếp lại thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -202,7 +218,7 @@ export const ReorderChapters = async (
     if (!chapters || chapters.length === 0) {
       return {
         status: "error",
-        message: "Chapters are required",
+        message: "Chương là bắt buộc",
       };
     }
 
@@ -221,6 +237,8 @@ export const ReorderChapters = async (
     await prisma.$transaction(updates);
 
     revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
@@ -229,7 +247,7 @@ export const ReorderChapters = async (
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -243,7 +261,7 @@ export const CreateChapter = async (
     if (!result.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
@@ -270,6 +288,8 @@ export const CreateChapter = async (
     });
 
     revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
@@ -322,15 +342,17 @@ export const CreateLesson = async (
     });
 
     revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Lesson created successfully",
+      message: "Bài học đã được tạo thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -362,7 +384,7 @@ export const RemoveLesson = async (
     if (!chapterWithLessons) {
       return {
         status: "error",
-        message: "Chapter not found",
+        message: "Không tìm thấy chương",
       };
     }
 
@@ -373,7 +395,7 @@ export const RemoveLesson = async (
     if (!lessonToDelete) {
       return {
         status: "error",
-        message: "Lesson not found",
+        message: "Không tìm thấy bài học",
       };
     }
 
@@ -401,15 +423,17 @@ export const RemoveLesson = async (
     ]);
 
     revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Lesson deleted successfully",
+      message: "Bài học đã được xóa thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };
@@ -440,7 +464,7 @@ export const RemoveChapter = async (
     if (!courseWithChapters) {
       return {
         status: "error",
-        message: "Course not found",
+        message: "Không tìm thấy khóa học",
       };
     }
 
@@ -453,7 +477,7 @@ export const RemoveChapter = async (
     if (!chapterToDelete) {
       return {
         status: "error",
-        message: "Chapter not found",
+        message: "Không tìm thấy chương",
       };
     }
 
@@ -482,15 +506,105 @@ export const RemoveChapter = async (
     ]);
 
     revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Chapter deleted successfully",
+      message: "Chương đã được xóa thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
+    };
+  }
+};
+
+export const CreateCourseStructureFromAI = async (
+  courseId: string,
+  structure: {
+    chapters: Array<{ name: string; lessons: Array<{ name: string }> }>;
+  }
+): Promise<ApiResponse> => {
+  const session = await requireAdmin();
+
+  try {
+    // Verify course exists and belongs to admin
+    const course = await prisma.course.findUnique({
+      where: {
+        id: courseId,
+        userId: session?.user?.id as string,
+      },
+    });
+
+    if (!course) {
+      return {
+        status: "error",
+        message: "Không tìm thấy khóa học",
+      };
+    }
+
+    if (!structure.chapters || structure.chapters.length === 0) {
+      return {
+        status: "error",
+        message: "Cấu trúc không hợp lệ: cần ít nhất 1 chương",
+      };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Get current max chapter position
+      const maxChapterPos = await tx.chapter.findFirst({
+        where: { courseId },
+        select: { position: true },
+        orderBy: { position: "desc" },
+      });
+      let currentChapterPosition = (maxChapterPos?.position ?? 0) + 1;
+
+      // Create chapters and lessons
+      for (const chapterData of structure.chapters) {
+        // Create chapter
+        const chapter = await tx.chapter.create({
+          data: {
+            title: chapterData.name,
+            courseId,
+            position: currentChapterPosition++,
+          },
+        });
+
+        // Get current max lesson position for this chapter
+        const maxLessonPos = await tx.lesson.findFirst({
+          where: { chapterId: chapter.id },
+          select: { position: true },
+          orderBy: { position: "desc" },
+        });
+        let currentLessonPosition = (maxLessonPos?.position ?? 0) + 1;
+
+        // Create lessons for this chapter
+        for (const lessonData of chapterData.lessons) {
+          await tx.lesson.create({
+            data: {
+              title: lessonData.name,
+              chapterId: chapter.id,
+              position: currentLessonPosition++,
+            },
+          });
+        }
+      }
+    });
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
+
+    return {
+      status: "success",
+      message: `Đã tạo ${structure.chapters.length} chương và ${structure.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0)} bài học thành công`,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

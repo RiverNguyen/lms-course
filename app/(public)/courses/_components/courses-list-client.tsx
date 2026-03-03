@@ -16,6 +16,7 @@ interface CoursesListClientProps {
   filters: CourseFiltersType;
   totalPages: number;
   currentPage: number;
+  wishlistCourseIds?: string[];
 }
 
 const CoursesListClient = ({
@@ -23,6 +24,7 @@ const CoursesListClient = ({
   filters,
   totalPages,
   currentPage,
+  wishlistCourseIds = [],
 }: CoursesListClientProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,19 +36,27 @@ const CoursesListClient = ({
   const levels = searchParams.get("levels")?.split(",").filter(Boolean) || [];
   const price = (searchParams.get("price") as "all" | "free" | "paid") || "all";
 
-  const handleCategoryChange = (categoryId: string) => {
+  const pushIfChanged = (params: URLSearchParams) => {
+    const newQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (newQuery !== currentQuery) {
+      router.push(newQuery ? `${pathname}?${newQuery}` : pathname);
+    }
+  };
+
+  const handleCategoryChange = (categorySlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    const currentCategories = categories.includes(categoryId)
-      ? categories.filter((id) => id !== categoryId)
-      : [...categories, categoryId];
+    const currentCategories = categories.includes(categorySlug)
+      ? categories.filter((s) => s !== categorySlug)
+      : [...categories, categorySlug];
 
     if (currentCategories.length > 0) {
       params.set("categories", currentCategories.join(","));
     } else {
       params.delete("categories");
     }
-    params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}`);
+    params.delete("page"); // Trang 1: bỏ page để URL ổn định, tránh reload
+    pushIfChanged(params);
   };
 
   const handleLevelChange = (level: string) => {
@@ -56,8 +66,8 @@ const CoursesListClient = ({
     } else {
       params.set("levels", level);
     }
-    params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}`);
+    params.delete("page");
+    pushIfChanged(params);
   };
 
   const handlePriceChange = (newPrice: "all" | "free" | "paid") => {
@@ -67,8 +77,8 @@ const CoursesListClient = ({
     } else {
       params.set("price", newPrice);
     }
-    params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}`);
+    params.delete("page");
+    pushIfChanged(params);
   };
 
   // Convert FilteredCourseType to AllCoursesType for grid view compatibility
@@ -82,6 +92,7 @@ const CoursesListClient = ({
     level: course.level,
     duration: course.duration,
     category: course.category,
+    _count: course._count,
   }));
 
   return (
@@ -106,13 +117,21 @@ const CoursesListClient = ({
         ) : viewMode === "list" ? (
           <div className="space-y-4">
             {courses.map((course) => (
-              <CourseListCard key={course.id} data={course} />
+              <CourseListCard
+                key={course.id}
+                data={course}
+                initialInWishlist={wishlistCourseIds.includes(course.id)}
+              />
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {gridCourses.map((course) => (
-              <PublicCourseCard key={course.id} data={course} />
+              <PublicCourseCard
+                key={course.id}
+                data={course}
+                initialInWishlist={wishlistCourseIds.includes(course.id)}
+              />
             ))}
           </div>
         )}

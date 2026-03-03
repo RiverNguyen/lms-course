@@ -30,12 +30,12 @@ export const UpdateLesson = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -44,7 +44,7 @@ export const UpdateLesson = async (
     if (!result.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
@@ -62,12 +62,12 @@ export const UpdateLesson = async (
 
     return {
       status: "success",
-      message: "Lesson updated successfully",
+      message: "Bài học đã được cập nhật thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

@@ -6,6 +6,121 @@ import { ApiResponse } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { checkCourseCompletionAndIssueCertificate } from "@/app/data/course/check-course-completion";
 
+// --- Lesson Note ---
+export const saveLessonNoteAction = async (lessonId: string, content: string, slug: string): Promise<ApiResponse> => {
+  try {
+    const session = await requireUser();
+
+    await prisma.lessonNote.upsert({
+      where: {
+        userId_lessonId: {
+          userId: session.id,
+          lessonId,
+        },
+      },
+      update: { content: content.slice(0, 50000) },
+      create: {
+        userId: session.id,
+        lessonId,
+        content: content.slice(0, 50000),
+      },
+    });
+
+    revalidatePath(`/dashboard/${slug}/${lessonId}`);
+    return { status: "success", message: "Đã lưu ghi chú" };
+  } catch (error) {
+    console.error("Error saving lesson note:", error);
+    return { status: "error", message: "Không thể lưu ghi chú" };
+  }
+};
+
+// --- Lesson Bookmarks ---
+export const addLessonBookmarkAction = async (
+  lessonId: string,
+  timestamp: number,
+  label: string | null,
+  slug: string
+): Promise<ApiResponse> => {
+  try {
+    const session = await requireUser();
+    const roundedTimestamp = Math.max(0, Math.floor(timestamp));
+
+    await prisma.lessonBookmark.create({
+      data: {
+        userId: session.id,
+        lessonId,
+        timestamp: roundedTimestamp,
+        label: label?.trim().slice(0, 200) ?? null,
+      },
+    });
+
+    revalidatePath(`/dashboard/${slug}/${lessonId}`);
+    return { status: "success", message: "Đã thêm bookmark" };
+  } catch (error) {
+    console.error("Error adding bookmark:", error);
+    return { status: "error", message: "Không thể thêm bookmark" };
+  }
+};
+
+export const deleteLessonBookmarkAction = async (
+  bookmarkId: string,
+  slug: string,
+  lessonId: string
+): Promise<ApiResponse> => {
+  try {
+    const session = await requireUser();
+
+    await prisma.lessonBookmark.deleteMany({
+      where: {
+        id: bookmarkId,
+        userId: session.id,
+        lessonId,
+      },
+    });
+
+    revalidatePath(`/dashboard/${slug}/${lessonId}`);
+    return { status: "success", message: "Đã xóa bookmark" };
+  } catch (error) {
+    console.error("Error deleting bookmark:", error);
+    return { status: "error", message: "Không thể xóa bookmark" };
+  }
+};
+
+// --- Search notes in course ---
+export const searchLessonNotesInCourseAction = async (
+  courseSlug: string,
+  query: string
+): Promise<{ status: "success"; items: Awaited<ReturnType<typeof import("@/app/data/course/search-lesson-notes").searchLessonNotes>> } | { status: "error"; message: string }> => {
+  try {
+    const session = await requireUser();
+
+    const course = await prisma.course.findUnique({
+      where: { slug: courseSlug },
+      select: { id: true },
+    });
+    if (!course) {
+      return { status: "error", message: "Không tìm thấy khóa học" };
+    }
+
+    const enrollment = await prisma.enrollment.findUnique({
+      where: {
+        userId_courseId: { userId: session.id, courseId: course.id },
+      },
+      select: { status: true },
+    });
+    if (!enrollment || (enrollment.status !== "Active" && enrollment.status !== "Completed")) {
+      return { status: "error", message: "Bạn chưa đăng ký khóa học này" };
+    }
+
+    const { searchLessonNotes } = await import("@/app/data/course/search-lesson-notes");
+    const items = await searchLessonNotes(course.id, query);
+    return { status: "success", items };
+  } catch (error) {
+    console.error("Error searching notes:", error);
+    return { status: "error", message: "Không thể tìm kiếm ghi chú" };
+  }
+};
+
 export const markLessonAsCompletedAction = async (lessonId: string, slug: string): Promise<ApiResponse & { courseCompleted?: boolean; certificateId?: string; nextLessonId?: string }> => {
   const session = await requireUser();
 
@@ -34,7 +149,7 @@ export const markLessonAsCompletedAction = async (lessonId: string, slug: string
     if (!lesson) {
       return {
         status: 'error',
-        message: 'Lesson not found',
+        message: 'Không tìm thấy bài học',
       };
     }
 
@@ -133,7 +248,7 @@ export const markLessonAsCompletedAction = async (lessonId: string, slug: string
 
     return {
       status: 'success',
-      message: 'Lesson marked as completed',
+      message: 'Bài học đã được đánh dấu hoàn thành',
       courseCompleted: false,
       nextLessonId,
     };
@@ -141,7 +256,7 @@ export const markLessonAsCompletedAction = async (lessonId: string, slug: string
     console.error('Error marking lesson as completed:', error);
     return {
       status: 'error',
-      message: 'Failed to mark lesson as completed',
+      message: 'Không thể đánh dấu bài học đã hoàn thành',
     };
   }
 }

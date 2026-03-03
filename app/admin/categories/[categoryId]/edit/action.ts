@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
 import { CategorySchemaType, categorySchema } from "@/lib/zod-schemas";
 import { request } from "@arcjet/next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -32,12 +32,12 @@ export const EditCategory = async (
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "You are a bot!",
+          message: "Bạn là bot!",
         };
       }
     }
@@ -46,7 +46,7 @@ export const EditCategory = async (
     if (!result.success) {
       return {
         status: "error",
-        message: "Invalid data",
+        message: "Dữ liệu không hợp lệ",
       };
     }
 
@@ -60,7 +60,7 @@ export const EditCategory = async (
     if (existingCategory && existingCategory.id !== categoryId) {
       return {
         status: "error",
-        message: "A category with this slug already exists",
+        message: "Một danh mục với slug này đã tồn tại",
       };
     }
 
@@ -75,15 +75,16 @@ export const EditCategory = async (
 
     revalidatePath(`/admin/categories`);
     revalidatePath(`/admin/categories/${categoryId}/edit`);
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Category updated successfully",
+      message: "Danh mục đã được cập nhật thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

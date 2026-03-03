@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { Navbar } from "@/app/(public)/_components/navbar";
 import { Footer } from "@/app/(public)/_components/footer";
 import { ScrollToTop } from "@/app/(public)/_components/scroll-to-top";
+import { AiAssistant } from "@/app/(public)/_components/ai-assistant";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,10 +18,13 @@ export const metadata: Metadata = {
 const LayoutPublic = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Suspense fallback={<div className="h-16 border-b bg-background" />}>
+        <Navbar />
+      </Suspense>
       <main className="flex-1 pb-10">{children}</main>
       <Footer />
       <ScrollToTop />
+      <AiAssistant />
     </div>
   );
 };

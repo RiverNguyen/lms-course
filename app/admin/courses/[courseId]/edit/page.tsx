@@ -29,23 +29,23 @@ const EditCoursePage = async ({ params }: { params: Params }) => {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">
-        Edit Course:{" "}
+        Chỉnh sửa Khóa học:{" "}
         <span className="text-primary underline">{data?.title}</span>
       </h1>
 
       <Tabs defaultValue="basic-info">
         <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
-          <TabsTrigger value="course-structure">Course Structure</TabsTrigger>
+          <TabsTrigger value="basic-info">Thông tin cơ bản</TabsTrigger>
+          <TabsTrigger value="course-structure">Cấu trúc Khóa học</TabsTrigger>
         </TabsList>
 
         <TabsContents>
           <TabsContent value="basic-info">
             <Card>
               <CardHeader>
-                <CardTitle>Basic Info</CardTitle>
+                <CardTitle>Thông tin cơ bản</CardTitle>
                 <CardDescription>
-                  Provide basic information about the course
+                  Nhập thông tin cơ bản về khóa học
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -57,9 +57,9 @@ const EditCoursePage = async ({ params }: { params: Params }) => {
           <TabsContent value="course-structure">
             <Card>
               <CardHeader>
-                <CardTitle>Course Structure</CardTitle>
+                <CardTitle>Cấu trúc Khóa học</CardTitle>
                 <CardDescription>
-                  Provide course structure for the course
+                  Quản lý cấu trúc khóa học (chương và bài học)
                 </CardDescription>
               </CardHeader>
               <CardContent>

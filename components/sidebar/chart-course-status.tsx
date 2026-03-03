@@ -22,15 +22,15 @@ import { adminGetCourseStatusData } from "@/app/data/admin/admin-get-chart-data"
 
 const chartConfig = {
   Draft: {
-    label: "Draft",
+    label: "Bản nháp",
     color: "hsl(220 13% 91%)",
   },
   Published: {
-    label: "Published",
+    label: "Đã xuất bản",
     color: "hsl(142 76% 36%)",
   },
   Archived: {
-    label: "Archived",
+    label: "Đã lưu trữ",
     color: "hsl(38 92% 50%)",
   },
 } satisfies ChartConfig
@@ -50,9 +50,9 @@ export function ChartCourseStatus({ data }: ChartCourseStatusProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Course Status Distribution</CardTitle>
+        <CardTitle>Phân bố trạng thái khóa học</CardTitle>
         <CardDescription>
-          Total courses: {total}
+          Tổng số khóa học: {total}
         </CardDescription>
       </CardHeader>
       <CardContent>

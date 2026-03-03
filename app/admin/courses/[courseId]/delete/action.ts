@@ -5,7 +5,7 @@ import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
 import { request } from "@arcjet/next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const aj = arcjet.withRule(
   fixedWindow({
@@ -26,12 +26,12 @@ export const DeleteCourse = async (courseId: string): Promise<ApiResponse> => {
       if (decision.reason.isRateLimit()) {
         return {
           status: "error",
-          message: "Too many requests",
+          message: "Quá nhiều yêu cầu",
         };
       } else {
         return {
           status: "error",
-          message: "Unauthorized",
+          message: "Không được phép",
         };
       }
     }
@@ -43,15 +43,17 @@ export const DeleteCourse = async (courseId: string): Promise<ApiResponse> => {
     });
 
     revalidatePath(`/admin/courses`);
+    revalidateTag("courses", "max");
+    revalidateTag("course-filters", "max");
 
     return {
       status: "success",
-      message: "Course deleted successfully",
+      message: "Khóa học đã được xóa thành công",
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : "Lỗi không xác định",
     };
   }
 };

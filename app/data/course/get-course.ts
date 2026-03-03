@@ -14,6 +14,7 @@ export const getIndividualCourse = async (slug: string) => {
       price: true,
       duration: true,
       level: true,
+      slug: true,
       category: {
         select: {
           id: true,
@@ -30,6 +31,8 @@ export const getIndividualCourse = async (slug: string) => {
             select: {
               id: true,
               title: true,
+              videoKey: true,
+              thumbnailKey: true,
             },
             orderBy: {
               position: "asc",
@@ -39,6 +42,9 @@ export const getIndividualCourse = async (slug: string) => {
         orderBy: {
           position: "asc",
         },
+      },
+      _count: {
+        select: { enrollments: true },
       },
     },
   });

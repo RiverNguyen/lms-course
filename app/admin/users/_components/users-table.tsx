@@ -50,11 +50,12 @@ import {
   ChevronRightIcon,
   MoreHorizontalIcon,
   SearchIcon,
-  Loader2Icon,
   BanIcon,
   CheckCircle2Icon,
   BookOpenIcon,
   ShoppingCartIcon,
+  EyeIcon,
+  Loader2Icon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -62,6 +63,7 @@ import { toast } from "sonner";
 import { tryCatch } from "@/hooks/try-catch";
 import { banUser, unbanUser } from "../actions";
 import { BanDialog } from "./ban-dialog";
+import { UserInfoDialog } from "./user-info-dialog";
 import {
   Select,
   SelectContent,
@@ -97,6 +99,7 @@ export function UsersTable({ users }: UsersTableProps) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [banDialogOpen, setBanDialogOpen] = React.useState(false);
   const [unbanDialogOpen, setUnbanDialogOpen] = React.useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] =
     React.useState<AdminUserType | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -137,6 +140,12 @@ export function UsersTable({ users }: UsersTableProps) {
   const handleUnbanClick = (user: AdminUserType) => {
     setSelectedUser(user);
     setUnbanDialogOpen(true);
+  };
+
+  const handleViewInfoClick = (user: AdminUserType) => {
+    setSelectedUser(user);
+    // Trì hoãn mở dialog để dropdown đóng trước, tránh xung đột Radix
+    setTimeout(() => setInfoDialogOpen(true), 0);
   };
 
   const handleBanConfirm = async (banReason: string) => {
@@ -195,7 +204,7 @@ export function UsersTable({ users }: UsersTableProps) {
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
+          aria-label="Chọn dòng"
         />
       ),
       header: ({ table }) => (
@@ -205,7 +214,7 @@ export function UsersTable({ users }: UsersTableProps) {
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label="Chọn tất cả"
         />
       ),
     },
@@ -218,7 +227,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Name
+            Tên
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -257,7 +266,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Role
+            Vai trò
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -273,7 +282,7 @@ export function UsersTable({ users }: UsersTableProps) {
     },
     {
       accessorKey: "banned",
-      header: "Status",
+      header: "Trạng thái",
       cell: ({ row }) => {
         const banned = row.getValue("banned") as boolean | null;
         return (
@@ -281,12 +290,12 @@ export function UsersTable({ users }: UsersTableProps) {
             {banned ? (
               <>
                 <BanIcon className="mr-1 h-3 w-3" />
-                Banned
+                Đã khóa
               </>
             ) : (
               <>
                 <CheckCircle2Icon className="mr-1 h-3 w-3" />
-                Active
+                Hoạt động
               </>
             )}
           </Badge>
@@ -295,7 +304,7 @@ export function UsersTable({ users }: UsersTableProps) {
     },
     {
       accessorKey: "banReason",
-      header: "Ban Reason",
+      header: "Lý do khóa",
       cell: ({ row }) => {
         const reason = row.original.banReason;
         return reason ? (
@@ -318,7 +327,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Courses
+            Khóa học
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -342,7 +351,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Enrollments
+            Đăng ký
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -366,7 +375,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Created
+            Ngày tạo
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -389,7 +398,7 @@ export function UsersTable({ users }: UsersTableProps) {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            Updated
+            Cập nhật
             <ArrowUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -414,12 +423,17 @@ export function UsersTable({ users }: UsersTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Mở menu</span>
                 <MoreHorizontalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleViewInfoClick(user)}>
+                <EyeIcon className="mr-2 h-4 w-4" />
+                Xem thông tin
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               {isBanned ? (
                 <DropdownMenuItem
@@ -427,7 +441,7 @@ export function UsersTable({ users }: UsersTableProps) {
                   disabled={user.role === "admin"}
                 >
                   <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                  Unban User
+                  Bỏ khóa Người dùng
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem
@@ -436,7 +450,7 @@ export function UsersTable({ users }: UsersTableProps) {
                   className="text-destructive"
                 >
                   <BanIcon className="mr-2 h-4 w-4" />
-                  Ban User
+                  Khóa Người dùng
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -478,7 +492,7 @@ export function UsersTable({ users }: UsersTableProps) {
           <div className="relative flex-1 max-w-sm">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search users..."
+              placeholder="Tìm kiếm người dùng..."
               value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
@@ -501,9 +515,9 @@ export function UsersTable({ users }: UsersTableProps) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -533,7 +547,7 @@ export function UsersTable({ users }: UsersTableProps) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No users found.
+                  Không tìm thấy người dùng nào.
                 </TableCell>
               </TableRow>
             )}
@@ -544,18 +558,17 @@ export function UsersTable({ users }: UsersTableProps) {
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {table.getRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} user
-          {table.getFilteredRowModel().rows.length === 1 ? "" : "s"}
+          Hiển thị {table.getRowModel().rows.length} trong{" "}
+          {table.getFilteredRowModel().rows.length} người dùng
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span className="ml-2">
-              ({table.getFilteredSelectedRowModel().rows.length} selected)
+              ({table.getFilteredSelectedRowModel().rows.length} đã chọn)
             </span>
           )}
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <span className="text-sm text-muted-foreground">Dòng mỗi trang:</span>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -584,10 +597,10 @@ export function UsersTable({ users }: UsersTableProps) {
               disabled={!table.getCanPreviousPage()}
             >
               <ChevronLeftIcon className="h-4 w-4" />
-              Previous
+              Trước
             </Button>
             <div className="text-sm text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              Trang {table.getState().pagination.pageIndex + 1} /{" "}
               {table.getPageCount()}
             </div>
             <Button
@@ -596,7 +609,7 @@ export function UsersTable({ users }: UsersTableProps) {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              Sau
               <ChevronRightIcon className="h-4 w-4" />
             </Button>
           </div>
@@ -614,18 +627,25 @@ export function UsersTable({ users }: UsersTableProps) {
         />
       )}
 
+      {/* User Info Dialog */}
+      <UserInfoDialog
+        open={infoDialogOpen}
+        onOpenChange={setInfoDialogOpen}
+        user={selectedUser}
+      />
+
       {/* Unban Confirmation Dialog */}
       <AlertDialog open={unbanDialogOpen} onOpenChange={setUnbanDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will unban <strong>{selectedUser?.name}</strong> and restore
-              their access to the platform.
+              Sẽ bỏ khóa <strong>{selectedUser?.name}</strong> và khôi phục
+              quyền truy cập của họ vào nền tảng.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleUnbanConfirm}
               disabled={isPending}
@@ -633,7 +653,7 @@ export function UsersTable({ users }: UsersTableProps) {
               {isPending && (
                 <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Unban User
+              Bỏ khóa Người dùng
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

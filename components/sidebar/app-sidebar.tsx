@@ -7,7 +7,10 @@ import {
   IconFileDescription,
   IconFolder,
   IconListDetails,
+  IconMessageStar,
+  IconReceipt,
   IconSettings,
+  IconTag,
   IconUsers
 } from "@tabler/icons-react";
 import * as React from "react";
@@ -32,24 +35,39 @@ import Logo from "@/public/logo.svg";
 const data = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "Bảng điều khiển",
       url: "/admin",
       icon: IconDashboard,
     },
     {
-      title: "Courses",
+      title: "Khóa học",
       url: "/admin/courses",
       icon: IconListDetails,
     },
     {
-      title: "Categories",
+      title: "Danh mục",
       url: "/admin/categories",
       icon: IconFolder,
     },
     {
-      title: "Users",
+      title: "Người dùng",
       url: "/admin/users",
       icon: IconUsers,
+    },
+    {
+      title: "Đơn hàng",
+      url: "/admin/orders",
+      icon: IconReceipt,
+    },
+    {
+      title: "Đánh giá",
+      url: "/admin/reviews",
+      icon: IconMessageStar,
+    },
+    {
+      title: "Mã giảm giá",
+      url: "/admin/coupons",
+      icon: IconTag,
     }
   ],
   navClouds: [
@@ -60,26 +78,26 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Đề xuất đang hoạt động",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Đã lưu trữ",
           url: "#",
         },
       ],
     },
     {
-      title: "Proposal",
+      title: "Đề xuất",
       icon: IconFileDescription,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Đề xuất đang hoạt động",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Đã lưu trữ",
           url: "#",
         },
       ],
@@ -90,11 +108,11 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Đề xuất đang hoạt động",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Đã lưu trữ",
           url: "#",
         },
       ],
@@ -102,7 +120,7 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Settings",
+      title: "Cài đặt",
       url: "#",
       icon: IconSettings,
     },

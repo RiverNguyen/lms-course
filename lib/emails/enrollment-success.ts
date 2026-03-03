@@ -18,10 +18,10 @@ export const sendEnrollmentSuccessEmail = async ({
   amount,
   enrollmentId,
 }: EnrollmentSuccessEmailProps) => {
-  const formattedAmount = new Intl.NumberFormat("en-US", {
+  const formattedAmount = new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "USD",
-  }).format(Number(amount) / 100);
+    currency: "VND",
+  }).format(Number(amount));
 
   const courseUrl = `${env.BETTER_AUTH_URL}/courses/${courseSlug}`;
   const dashboardUrl = `${env.BETTER_AUTH_URL}/dashboard`;
@@ -30,7 +30,7 @@ export const sendEnrollmentSuccessEmail = async ({
     await sendEmailViaGmail({
       from: "TunaLMS",
       to: userEmail,
-      subject: `Payment Successful - Welcome to ${courseTitle}!`,
+      subject: `Thanh toán thành công - Chào mừng đến với ${courseTitle}!`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -46,7 +46,7 @@ export const sendEnrollmentSuccessEmail = async ({
                     <!-- Header -->
                     <tr>
                       <td style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);padding:32px 40px;text-align:center;">
-                        <h1 style="margin:0;font-size:28px;font-weight:700;color:#ffffff;">Payment Successful! 🎉</h1>
+                        <h1 style="margin:0;font-size:28px;font-weight:700;color:#ffffff;">Thanh toán thành công! 🎉</h1>
                       </td>
                     </tr>
                     
@@ -54,11 +54,11 @@ export const sendEnrollmentSuccessEmail = async ({
                     <tr>
                       <td style="padding:40px;">
                         <p style="margin:0 0 16px 0;font-size:16px;color:#1f2937;line-height:1.6;">
-                          Hi ${userName},
+                          Xin chào ${userName},
                         </p>
                         
                         <p style="margin:0 0 24px 0;font-size:16px;color:#1f2937;line-height:1.6;">
-                          Congratulations! Your payment has been processed successfully. You are now enrolled in:
+                          Chúc mừng! Thanh toán của bạn đã được xử lý thành công. Bạn đã được ghi danh vào khóa học:
                         </p>
                         
                         <!-- Course Card -->
@@ -69,7 +69,7 @@ export const sendEnrollmentSuccessEmail = async ({
                                 ${courseTitle}
                               </h2>
                               <p style="margin:0;font-size:14px;color:#6b7280;">
-                                Enrollment ID: ${enrollmentId}
+                                Mã ghi danh: ${enrollmentId}
                               </p>
                             </td>
                           </tr>
@@ -79,7 +79,7 @@ export const sendEnrollmentSuccessEmail = async ({
                         <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:24px 0;">
                           <tr>
                             <td style="padding:12px 0;border-bottom:1px solid #e5e7eb;">
-                              <span style="font-size:14px;color:#6b7280;">Amount Paid:</span>
+                              <span style="font-size:14px;color:#6b7280;">Số tiền thanh toán:</span>
                               <span style="float:right;font-size:16px;font-weight:600;color:#111827;">${formattedAmount}</span>
                             </td>
                           </tr>
@@ -99,7 +99,7 @@ export const sendEnrollmentSuccessEmail = async ({
                                 <tr>
                                   <td style="border-radius:6px;background:#667eea;padding:12px 24px;">
                                     <a href="${courseUrl}" style="display:inline-block;text-decoration:none;color:#ffffff;font-weight:600;font-size:16px;">
-                                      Start Learning →
+                                      Bắt đầu học →
                                     </a>
                                   </td>
                                 </tr>
@@ -112,18 +112,18 @@ export const sendEnrollmentSuccessEmail = async ({
                           <tr>
                             <td align="center">
                               <a href="${dashboardUrl}" style="color:#667eea;text-decoration:none;font-size:14px;">
-                                View My Dashboard
+                                Xem tổng quan của tôi
                               </a>
                             </td>
                           </tr>
                         </table>
                         
                         <p style="margin:32px 0 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
-                          You can now access all course materials, videos, and resources. We're excited to have you on this learning journey!
+                          Bạn có thể truy cập tất cả tài liệu, video và tài nguyên của khóa học. Chúng tôi rất vui được đồng hành cùng bạn trên hành trình học tập!
                         </p>
                         
                         <p style="margin:24px 0 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
-                          If you have any questions or need assistance, feel free to reach out to our support team.
+                          Nếu có bất kỳ câu hỏi hoặc cần hỗ trợ, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi.
                         </p>
                       </td>
                     </tr>
@@ -132,10 +132,10 @@ export const sendEnrollmentSuccessEmail = async ({
                     <tr>
                       <td style="background:#f9fafb;padding:24px 40px;text-align:center;border-top:1px solid #e5e7eb;">
                         <p style="margin:0 0 8px 0;font-size:14px;color:#6b7280;">
-                          Happy Learning!
+                          Chúc bạn học tập hiệu quả!
                         </p>
                         <p style="margin:0;font-size:12px;color:#9ca3af;">
-                          — The TunaLMS Team
+                          — Đội ngũ TunaLMS
                         </p>
                       </td>
                     </tr>
